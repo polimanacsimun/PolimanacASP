@@ -346,6 +346,13 @@ namespace InventoryManagement.Console
             System.Console.WriteLine($"Orders created in March 2026: {marchOrders.Count}");
             // Pronalazi sve narudžbe kreirane u ožujku 2026. i sortira ih po datumu silazno.
 
+            // Ispis područnih narudžbi iz kolekcije marchOrders
+            System.Console.WriteLine("March 2026 orders (sorted):");
+            foreach (var order in marchOrders)
+            {
+                System.Console.WriteLine($"- {order.OrderNumber} ({order.OrderDate:yyyy-MM-dd}) {order.Status} Total: {order.TotalPrice:C}");
+            }
+
 
             // 4) TotalRevenueDelivered
             var totalRevenueDelivered = orders

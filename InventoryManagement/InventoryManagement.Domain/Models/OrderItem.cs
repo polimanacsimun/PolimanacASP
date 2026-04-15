@@ -4,6 +4,7 @@ namespace InventoryManagement.Console.Models
 {
     public class OrderItem
     {
+        //spojna klasa koja rijesava N-N izmedju Order i Product
         public int Id { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }

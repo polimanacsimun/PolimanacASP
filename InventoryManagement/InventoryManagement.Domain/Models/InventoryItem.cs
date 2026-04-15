@@ -4,6 +4,7 @@ namespace InventoryManagement.Console.Models
 {
     public class InventoryItem
     {
+        //spojna klasa koja rijesava N-N izmedju Product i Warehouse
         public int Id { get; set; }
         public int QuantityInStock { get; set; }
         public int MinimumQuantity { get; set; }
