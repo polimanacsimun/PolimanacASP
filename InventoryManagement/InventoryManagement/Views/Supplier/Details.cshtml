@@ -1,0 +1,200 @@
+@using System.Linq
+@model InventoryManagement.Domain.Models.Supplier
+
+@{
+    ViewData["Title"] = "Supplier Details";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Supplier" asp-action="Index">Suppliers</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model?.Name</li>
+        </ol>
+    </nav>
+
+    <header class="d-flex align-items-start justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-1">@Model?.Name</h1>
+            <p class="text-muted mb-0">Supplier profile and product portfolio — procurement view</p>
+        </div>
+        <div>
+            <a asp-controller="Supplier" asp-action="Index" class="btn btn-outline-secondary">
+                &larr; Back to Suppliers List
+            </a>
+        </div>
+    </header>
+
+    <div class="row g-3">
+        <!-- Left Column: Supplier Info + Contact -->
+        <div class="col-12 col-lg-6">
+            <!-- Supplier Information Card -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Supplier Information</h5>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Name</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model?.Name</dd>
+
+                        <dt class="col-sm-4 text-muted">Address</dt>
+                        <dd class="col-sm-8">@Model?.Address</dd>
+
+                        <dt class="col-sm-4 text-muted">Registered</dt>
+                        <dd class="col-sm-8">@Model?.RegistrationDate.ToString("dd MMM yyyy")</dd>
+
+                        <dt class="col-sm-4 text-muted">Status</dt>
+                        <dd class="col-sm-8">
+                            @if (Model != null && Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Contact Details Card -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Contact Details</h5>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Contact Person</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model?.ContactPerson</dd>
+
+                        <dt class="col-sm-4 text-muted">Phone</dt>
+                        <dd class="col-sm-8">
+                            <a href="tel:@Model?.Phone" class="text-decoration-none">@Model?.Phone</a>
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Email</dt>
+                        <dd class="col-sm-8">
+                            <a href="mailto:@Model?.Email" class="text-decoration-none">@Model?.Email</a>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Account Summary + Notes -->
+        <div class="col-12 col-lg-6">
+            <!-- Account Summary Card -->
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-3">Account Summary</h5>
+
+                    <div class="mb-3">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="text-muted small">Products Supplied</div>
+                                    <div class="h4 mb-0">@(Model?.Products?.Count ?? 0)</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="text-muted small">Active Since</div>
+                                    <div class="h5 mb-0">@Model?.RegistrationDate.ToString("yyyy")</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto text-muted small">
+                        <div>Supplier ID: <strong>@Model?.Id</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compliance Notes Card -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Notes & Compliance</h5>
+                    <p class="mb-0 text-muted">Read-only profile. Use supplier management tools to record compliance checks, contracts, or certifications.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Supplied Section -->
+    <section class="mt-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Products Supplied</h5>
+                    <small class="text-muted">@((Model?.Products?.Count ?? 0) + " items")</small>
+                </div>
+
+                @if (Model?.Products != null && Model.Products.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Product</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col" class="text-end">Price</th>
+                                    <th scope="col">UOM</th>
+                                    <th scope="col" class="text-center">Min Stock</th>
+                                    <th scope="col" class="text-center">Active</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in Model.Products)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">
+    <a asp-controller="Product" asp-action="Details" asp-route-id="@p.Id" class="text-decoration-none">
+        @p.Name
+    </a>
+</div>
+                                            @if (!string.IsNullOrWhiteSpace(p.Description))
+                                            {
+                                                <div class="text-muted small">@p.Description</div>
+                                            }
+                                        </td>
+                                        <td>@(p?.Category?.Name ?? "—")</td>
+                                        <td class="text-end">@p.Price.ToString("C")</td>
+                                        <td>@p.UnitOfMeasure</td>
+                                        <td class="text-center">@p.MinimumStock</td>
+                                        <td class="text-center">
+                                            @if (p.IsActive)
+                                            {
+                                                <span class="badge bg-success">Yes</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">No</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <p class="mb-0 text-muted">No products are currently associated with this supplier.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Navigation -->
+    <footer class="mt-4 d-flex justify-content-between align-items-center">
+        <div class="text-muted small">Last updated: @DateTime.Now.ToString("dd MMM yyyy HH:mm")</div>
+        <div>
+            <a asp-controller="Supplier" asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Suppliers List</a>
+        </div>
+    </footer>
+</div>

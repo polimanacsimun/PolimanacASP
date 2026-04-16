@@ -1,0 +1,165 @@
+@using InventoryManagement.Domain.Enums
+@using System
+@using System.Linq
+@model InventoryManagement.Domain.Models.Category
+
+@{
+    ViewData["Title"] = Model?.Name ?? "Category Details";
+    var products = Model?.Products ?? new List<InventoryManagement.Domain.Models.Product>();
+    var productCount = products.Count;
+    var activeCount = products.Count(p => p?.IsActive == true);
+    var avgPrice = productCount > 0 ? products.Average(p => p?.Price ?? 0m) : 0m;
+    var totalStockValue = products.Sum(p => (p?.InventoryItems?.Sum(ii => (ii?.QuantityInStock ?? 0)) ?? 0) * (p?.Price ?? 0m));
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Category" asp-action="Index">Categories</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model?.Name</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h1 class="h3 mb-1">@Model?.Name</h1>
+        <p class="text-muted mb-0">Category profile — read-only overview of category metadata and contained products.</p>
+    </div>
+    <div>
+        <a asp-controller="Category" asp-action="Index" class="btn btn-outline-secondary">&larr; Back to Categories</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Category Information</h5>
+                <dl class="row">
+                    <dt class="col-sm-4 text-muted">Name</dt>
+                    <dd class="col-sm-8">@Model?.Name ?? "—"</dd>
+
+                    <dt class="col-sm-4 text-muted">Description</dt>
+                    <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model?.Description) ? Model.Description : "No description provided.")</dd>
+                </dl>
+
+                <hr />
+
+                <h6 class="mb-2">Quick Product Summary</h6>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="border rounded p-3 bg-light" style="min-width:140px;">
+                        <small class="text-muted">Products</small>
+                        <div class="fs-4 fw-bold">@productCount</div>
+                    </div>
+                    <div class="border rounded p-3 bg-light" style="min-width:140px;">
+                        <small class="text-muted">Active</small>
+                        <div class="fs-4 fw-bold text-success">@activeCount</div>
+                    </div>
+                    <div class="border rounded p-3 bg-light" style="min-width:160px;">
+                        <small class="text-muted">Average Price</small>
+                        <div class="fs-5 fw-semibold">@avgPrice.ToString("C")</div>
+                    </div>
+                    <div class="border rounded p-3 bg-light" style="min-width:160px;">
+                        <small class="text-muted">Estimated Stock Value</small>
+                        <div class="fs-5 fw-semibold">@totalStockValue.ToString("C")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Category Metrics</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <small class="text-muted">Total products</small>
+                        <strong>@productCount</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <small class="text-muted">Active products</small>
+                        <strong class="text-success">@activeCount</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <small class="text-muted">Average price</small>
+                        <strong>@avgPrice.ToString("C")</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-2">
+                        <small class="text-muted">Estimated stock value</small>
+                        <strong>@totalStockValue.ToString("C")</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="mt-4">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Products in "@Model?.Name"</h5>
+                <small class="text-muted">@productCount product(s)</small>
+            </div>
+
+            @if (!products.Any())
+            {
+                <div class="p-4 text-center text-muted">
+                    <p class="mb-2">There are no products assigned to this category.</p>
+                    <p class="small">When products are added to this category they will appear here.</p>
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-sm btn-outline-primary mt-2">Browse Products</a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Product</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Type</th>
+                                <th scope="col" class="text-end">Price</th>
+                                <th scope="col" class="text-center">Min Stock</th>
+                                <th scope="col" class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in products)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-controller="Product" asp-action="Details" asp-route-id="@product?.Id">@product?.Name</a>
+                                        <div class="text-muted small">Supplier: @(product?.Supplier?.Name ?? "—")</div>
+                                    </td>
+                                    <td class="text-truncate" style="max-width:360px;">@(!string.IsNullOrWhiteSpace(product?.Description) ? product.Description : "—")</td>
+                                    <td>@(product?.Type.ToString() ?? "—")</td>
+                                    <td class="text-end">@((product?.Price ?? 0m).ToString("C"))</td>
+                                    <td class="text-center">@product?.MinimumStock</td>
+                                    <td class="text-center">
+                                        @if (product?.IsActive == true)
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+        <div class="card-footer text-muted d-flex justify-content-between">
+            <small>Last viewed: @DateTime.Now.ToString("g")</small>
+            <div>
+                <a asp-controller="Category" asp-action="Index" class="me-3">All Categories</a>
+                <a asp-controller="Product" asp-action="Index">All Products</a>
+            </div>
+        </div>
+    </div>
+</section>

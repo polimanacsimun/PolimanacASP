@@ -1,0 +1,319 @@
+@using System
+@using System.Linq
+@using InventoryManagement.Domain.Models
+@using InventoryManagement.Domain.Enums
+@model InventoryManagement.Domain.Models.Order
+
+@{
+    ViewData["Title"] = "Order Details";
+    var user = Model?.User;
+    var items = Model?.OrderItems ?? new List<OrderItem>();
+    var itemCount = items.Count;
+    var subtotalFromModel = items.Sum(i => i?.TotalPrice ?? 0m);
+    var computedSubtotal = items.Sum(i => ((i?.UnitPrice ?? 0m) * (i?.Quantity ?? 0)) - (i?.Discount ?? 0m));
+    var totalMatches = Math.Round(Model?.TotalPrice ?? 0m, 2) == Math.Round(subtotalFromModel, 2);
+    string StatusBadgeClass(InventoryManagement.Domain.Enums.OrderStatus s) =>
+        s == OrderStatus.Pending ? "bg-warning text-dark" :
+        s == OrderStatus.Processing ? "bg-info text-dark" :
+        s == OrderStatus.Delivered ? "bg-success" :
+        s == OrderStatus.Cancelled ? "bg-danger" : "bg-secondary";
+    string StatusIconSvg(InventoryManagement.Domain.Enums.OrderStatus s)
+    {
+        if (s == OrderStatus.Pending) return "<svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" class=\"me-1\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"8\" cy=\"8\" r=\"7\" stroke=\"#b45309\" stroke-width=\"1.5\"/><path d=\"M8 4v5l3 1\" stroke=\"#b45309\" stroke-width=\"1.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
+        if (s == OrderStatus.Processing) return "<svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" class=\"me-1\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M2 8a6 6 0 1 0 6-6\" stroke=\"#0ea5e9\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
+        if (s == OrderStatus.Delivered) return "<svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" class=\"me-1\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M2 8l3.5 3.5L14 3\" stroke=\"#166534\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
+        if (s == OrderStatus.Cancelled) return "<svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" class=\"me-1\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M3 3l10 10M13 3L3 13\" stroke=\"#7f1d1d\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
+        return "";
+    }
+    // Fulfillment progress (visual helper)
+    int FulfillmentPercent(OrderStatus s) => s == OrderStatus.Pending ? 10 : s == OrderStatus.Processing ? 60 : s == OrderStatus.Delivered ? 100 : 0;
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Order" asp-action="Index">Orders</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model?.OrderNumber</li>
+        </ol>
+    </nav>
+
+    <header class="d-flex align-items-start justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-1">@Model?.OrderNumber</h1>
+            <p class="text-muted mb-0">Order detail view — read-only summary of the order and its line items for operational review.</p>
+        </div>
+        <div class="text-end">
+            <a asp-controller="Order" asp-action="Index" class="btn btn-outline-secondary">
+                &larr; Back to Orders
+            </a>
+        </div>
+    </header>
+
+    <div class="row g-4">
+        <!-- Left column: Order information (approx 60%) -->
+        <div class="col-12 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title mb-0">Order Information</h5>
+                        <div class="text-end">
+                            <span class="badge @StatusBadgeClass(Model.Status)">
+                                @Html.Raw(StatusIconSvg(Model.Status))
+                                @Model?.Status.ToString()
+                            </span>
+                        </div>
+                    </div>
+
+                    <dl class="row mb-3">
+                        <dt class="col-sm-4 text-muted">Order Number</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model?.OrderNumber</dd>
+
+                        <dt class="col-sm-4 text-muted">Order Date</dt>
+                        <dd class="col-sm-8">@Model?.OrderDate.ToString("dd MMM yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-4 text-muted">Delivery Date</dt>
+                        <dd class="col-sm-8">
+                            @if (Model?.DeliveryDate != null)
+                            {
+                                <text>@Model.DeliveryDate.Value.ToString("dd MMM yyyy")</text>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not scheduled</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Total Price</dt>
+                        <dd class="col-sm-8 fw-semibold">@((Model?.TotalPrice ?? 0m).ToString("C"))</dd>
+
+                        <dt class="col-sm-4 text-muted">Status</dt>
+                        <dd class="col-sm-8">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height:8px;">
+                                    <div class="progress-bar @(
+                                        Model?.Status == OrderStatus.Delivered ? "bg-success" :
+                                        Model?.Status == OrderStatus.Processing ? "bg-info" :
+                                        Model?.Status == OrderStatus.Pending ? "bg-warning" : "bg-danger"
+                                    )" role="progressbar" style="width: @(FulfillmentPercent(Model.Status))%"></div>
+                                </div>
+                                <small class="text-muted ms-2">@FulfillmentPercent(Model.Status)%</small>
+                            </div>
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Note</dt>
+                        <dd class="col-sm-8">
+    @if (!string.IsNullOrWhiteSpace(Model?.Note))
+    {
+        @Model.Note
+    }
+    else
+    {
+        <span class="text-muted">No additional notes</span>
+    }
+</dd>
+                    </dl>
+
+                    <hr />
+
+                    <h6 class="mb-3">Order Items (@itemCount)</h6>
+
+                    @if (!items.Any())
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <p class="mb-1">This order currently has no line items.</p>
+                            <p class="small mb-0">If this looks incorrect, check order processing or the data source.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Description</th>
+                                        <th class="text-center">Qty</th>
+                                        <th class="text-end">Unit Price</th>
+                                        <th class="text-end">Discount</th>
+                                        <th class="text-end">Line Total</th>
+                                        <th class="text-muted small">Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var it in items)
+                                    {
+                                        var product = it?.Product;
+                                        var computedLine = ((it?.UnitPrice ?? 0m) * (it?.Quantity ?? 0)) - (it?.Discount ?? 0m);
+                                        var displayLine = it?.TotalPrice ?? computedLine;
+                                        var lineMismatch = Math.Round(displayLine,2) != Math.Round(computedLine,2);
+                                        <tr>
+                                            <td style="min-width:200px;">
+                                                <div class="fw-semibold">
+                                                    @if (product != null)
+                                                    {
+                                                        <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="text-decoration-none">@product.Name</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Unknown product</span>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td class="text-truncate" style="max-width:360px;">
+                                                @if (product != null && !string.IsNullOrWhiteSpace(product.Description))
+                                                {
+                                                    <div class="text-muted small">@product.Description</div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="text-muted small">—</div>
+                                                }
+                                            </td>
+                                            <td class="text-center">@it?.Quantity</td>
+                                            <td class="text-end">@((it?.UnitPrice ?? 0m).ToString("C"))</td>
+                                            <td class="text-end">@((it?.Discount ?? 0m).ToString("C"))</td>
+                                            <td class="text-end">
+                                                @displayLine.ToString("C")
+                                                @if (lineMismatch)
+                                                {
+                                                    <span class="badge bg-warning text-dark ms-2" title="Stored total differs from computed total">!</span>
+                                                }
+                                            </td>
+                                            <td class="text-muted small">@it?.CreatedAt.ToString("dd MMM yyyy HH:mm")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Subtotal (items):</small>
+                        <div class="fw-semibold">@subtotalFromModel.ToString("C")</div>
+                        <small class="text-muted">Computed subtotal: @computedSubtotal.ToString("C")</small>
+                        @if (Math.Round(subtotalFromModel,2) != Math.Round(computedSubtotal,2))
+                        {
+                            <div class="mt-1"><span class="badge bg-warning text-dark">Subtotal discrepancy</span></div>
+                        }
+                    </div>
+
+                    <div class="text-end">
+                        @if (totalMatches)
+                        {
+                            <span class="badge bg-success">Total matches</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Total mismatch</span>
+                        }
+                        <div class="text-muted small mt-1">Order total: <strong>@(Model?.TotalPrice ?? 0m).ToString("C")</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right column: Summary metrics and user info (approx 40%) -->
+        <div class="col-12 col-lg-5">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="text-muted mb-3">Order Summary</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex justify-content-between py-2 border-bottom">
+                            <small class="text-muted">Order #</small>
+                            <strong>@Model?.OrderNumber</strong>
+                        </li>
+                        <li class="d-flex justify-content-between py-2 border-bottom">
+                            <small class="text-muted">Placed</small>
+                            <strong>@Model?.OrderDate.ToString("d MMM yyyy")</strong>
+                        </li>
+                        <li class="d-flex justify-content-between py-2 border-bottom">
+                            <small class="text-muted">Items</small>
+                            <strong>@itemCount</strong>
+                        </li>
+                        <li class="d-flex justify-content-between py-2">
+                            <small class="text-muted">Total</small>
+                            <strong>@(Model?.TotalPrice ?? 0m).ToString("C")</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted mb-3">Placed By</h6>
+
+                    @if (user != null)
+                    {
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                                <span class="fw-bold">@((user.FirstName ?? "?").Substring(0,1))</span>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">@user.FirstName @user.LastName</div>
+                                <div class="small text-muted">@user.Email</div>
+                            </div>
+                        </div>
+
+                        <dl class="row mb-0">
+                            <dt class="col-6 text-muted">Role</dt>
+                            <dd class="col-6 text-end">
+    @if (user.Role == UserRole.Administrator)
+    {
+        <span class="badge bg-danger">@user.Role</span>
+    }
+    else if (user.Role == UserRole.Employee)
+    {
+        <span class="badge bg-info text-dark">@user.Role</span>
+    }
+    else
+    {
+        <span class="badge bg-success">@user.Role</span>
+    }
+</dd>
+
+                            <dt class="col-6 text-muted">Registered</dt>
+                            <dd class="col-6 text-end">@user.RegistrationDate.ToString("dd MMM yyyy")</dd>
+
+                            <dt class="col-6 text-muted">Account</dt>
+                            <dd class="col-6 text-end">
+                                @if (user.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </dd>
+                        </dl>
+                    }
+                    else
+                    {
+                        <div class="p-3 text-muted">User information not available for this order.</div>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <h6 class="text-muted mb-3">Quick Actions</h6>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Order" asp-action="Index" class="btn btn-outline-secondary">Back to Orders</a>
+                        <a asp-controller="Order" asp-action="Index" class="btn btn-sm btn-outline-primary">View All Orders</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer with timestamp and nav -->
+    <footer class="mt-4 d-flex justify-content-between align-items-center">
+        <div class="text-muted small">Viewed: @DateTime.Now.ToString("dd MMM yyyy HH:mm")</div>
+        <div>
+            <a asp-controller="Order" asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Orders</a>
+        </div>
+    </footer>
+</div>

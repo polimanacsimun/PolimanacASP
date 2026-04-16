@@ -5,6 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<ProductMockRepository>();
+builder.Services.AddSingleton<SupplierMockRepository>();
+builder.Services.AddSingleton<CategoryMockRepository>();
+builder.Services.AddSingleton<WarehouseMockRepository>();
+builder.Services.AddSingleton<UserMockRepository>();
 
 var app = builder.Build();
 

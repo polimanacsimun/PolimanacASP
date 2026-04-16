@@ -1,0 +1,219 @@
+@using InventoryManagement.Domain.Models
+@using InventoryManagement.Domain.Enums
+@model InventoryManagement.Domain.Models.User
+
+@{
+    ViewData["Title"] = "User Details";
+    var fullName = $"{Model?.FirstName} {Model?.LastName}".Trim();
+    var orders = Model?.Orders ?? Enumerable.Empty<Order>();
+    int totalOrders = orders.Count();
+    decimal totalSpent = orders.Sum(o => o?.TotalPrice ?? 0m);
+    var accountAgeDays = Model != null
+    ? (DateTime.Now - Model.RegistrationDate).TotalDays
+    : 0;
+
+    Func<UserRole, string> roleBadgeClass = role => role switch
+    {
+        UserRole.Administrator => "badge bg-danger",
+        UserRole.Employee => "badge bg-primary",
+        UserRole.Customer => "badge bg-success",
+        _ => "badge bg-secondary"
+    };
+
+    Func<bool, string> activeBadgeClass = isActive => isActive ? "badge bg-success" : "badge bg-secondary";
+
+    Func<OrderStatus, string> statusBadgeClass = s => s switch
+    {
+        OrderStatus.Pending => "badge bg-warning text-dark",
+        OrderStatus.Processing => "badge bg-info text-white",
+        OrderStatus.Delivered => "badge bg-success",
+        OrderStatus.Cancelled => "badge bg-danger",
+        _ => "badge bg-secondary"
+    };
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent px-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="User" asp-action="Index">Users</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@(!string.IsNullOrWhiteSpace(fullName) ? fullName : "User Details")</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h1 class="h4 mb-0">@(!string.IsNullOrWhiteSpace(fullName) ? fullName : "User Profile")</h1>
+            <p class="text-muted mb-0">Profile and account summary for this system user.</p>
+        </div>
+        <div>
+            <a asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">Back to Users</a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <strong>User Information</strong>
+                    <span class="text-muted small"> — profile details</span>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">First name</dt>
+                        <dd class="col-sm-8">@Model?.FirstName</dd>
+
+                        <dt class="col-sm-4 text-muted">Last name</dt>
+                        <dd class="col-sm-8">@Model?.LastName</dd>
+
+                        <dt class="col-sm-4 text-muted">Email</dt>
+                        <dd class="col-sm-8"><a href="mailto:@Model?.Email">@Model?.Email</a></dd>
+
+                        <dt class="col-sm-4 text-muted">Role</dt>
+                        <dd class="col-sm-8">
+                            <span class="@roleBadgeClass(Model.Role)">@Model.Role</span>
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Registered</dt>
+                        <dd class="col-sm-8">@Model?.RegistrationDate.ToString("D")</dd>
+
+                        <dt class="col-sm-4 text-muted">Account status</dt>
+                        <dd class="col-sm-8">
+                            <span class="@activeBadgeClass(Model.IsActive)">@(Model.IsActive ? "Active" : "Inactive")</span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="card-footer bg-white">
+                    <small class="text-muted">User ID: <span class="text-body">@Model?.Id</span></small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <strong>Account Summary</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 text-center">
+                        <div class="col-6">
+                            <div class="p-3 border rounded">
+                                <div class="h6 mb-1">Total Orders</div>
+                                <div class="fs-4 fw-bold">@totalOrders</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded">
+                                <div class="h6 mb-1">Total Spent</div>
+                                <div class="fs-4 fw-bold">@totalSpent.ToString("C")</div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="p-3 border rounded">
+                                <div class="h6 mb-1">Account Age</div>
+                                <div class="fs-5 fw-semibold">@Math.Floor(accountAgeDays) days</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded">
+                                <div class="h6 mb-1">Role</div>
+                                <div class="fs-6"><span class="@roleBadgeClass(Model.Role)">@Model.Role</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-muted small">
+                    <div>Last profile view: @DateTime.Now.ToString("g")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4 shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Order History</strong>
+                <div class="text-muted small">Recent orders placed by this user</div>
+            </div>
+            <div class="text-end text-muted small">Total: @totalOrders</div>
+        </div>
+        <div class="card-body">
+            @if (!orders.Any())
+            {
+                <div class="text-center py-5">
+                    <div class="mb-3 display-6 text-muted">🗂️</div>
+                    <h5 class="mb-1">No orders found</h5>
+                    <p class="text-muted">This user has not placed any orders yet.</p>
+                    <a asp-controller="User" asp-action="Index" class="btn btn-outline-primary">Back to Users</a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Order #</th>
+                                <th>Order date</th>
+                                <th class="text-end">Total</th>
+                                <th>Status</th>
+                                <th>Delivery date</th>
+                                <th>Note</th>
+                                <th class="text-center">Indicator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in orders.OrderByDescending(o => o?.OrderDate))
+                            {
+                                <tr>
+                                    <td>@order?.OrderNumber</td>
+                                    <td>@(order?.OrderDate.ToString("d"))</td>
+                                    <td class="text-end">@((order?.TotalPrice ?? 0m).ToString("C"))</td>
+                                    <td>
+                                        <span class="@statusBadgeClass(order.Status)">@order?.Status</span>
+                                    </td>
+                                    <td>@(order?.DeliveryDate.HasValue == true ? order.DeliveryDate.Value.ToString("d") : "—")</td>
+                                    <td>@(string.IsNullOrWhiteSpace(order?.Note) ? "—" : order.Note)</td>
+                                    <td class="text-center">
+                                        @switch (order.Status)
+                                        {
+                                            case OrderStatus.Delivered:
+                                                <span class="badge bg-success">✓ Delivered</span>
+                                                break;
+                                            case OrderStatus.Pending:
+                                                <span class="badge bg-warning text-dark">⏳ Pending</span>
+                                                break;
+                                            case OrderStatus.Processing:
+                                                <span class="badge bg-info text-white">⚙️ Processing</span>
+                                                break;
+                                            case OrderStatus.Cancelled:
+                                                <span class="badge bg-danger">✖ Cancelled</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary">—</span>
+                                                break;
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-between">
+            <small class="text-muted">Showing @totalOrders order(s).</small>
+            <div>
+                <a asp-controller="User" asp-action="Index" class="btn btn-sm btn-outline-secondary">Back to Users</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-4 text-muted small">
+        <div class="d-flex justify-content-between">
+            <div>Profile viewed: @DateTime.Now.ToString("f")</div>
+            <div><a asp-controller="Home" asp-action="Index">Home</a> · <a asp-controller="User" asp-action="Index">Users</a></div>
+        </div>
+    </footer>
+</div>

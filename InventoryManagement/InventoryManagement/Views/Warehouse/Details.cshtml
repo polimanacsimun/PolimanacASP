@@ -1,0 +1,246 @@
+@using System
+@using System.Linq
+@model InventoryManagement.Domain.Models.Warehouse
+
+@{
+    ViewData["Title"] = "Warehouse Details";
+    var items = Model?.InventoryItems ?? Enumerable.Empty<InventoryManagement.Domain.Models.InventoryItem>();
+    var totalQuantity = items.Sum(i => i?.QuantityInStock ?? 0);
+    var itemCount = items.Count();
+    double capacityUtil = (Model != null && Model.Capacity > 0) ? Math.Round(totalQuantity * 100.0 / Model.Capacity, 1) : 0.0;
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Warehouse" asp-action="Index">Warehouses</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model?.Name</li>
+        </ol>
+    </nav>
+
+    <header class="d-flex align-items-start justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-1">@Model?.Name</h1>
+            <p class="text-muted mb-0">Warehouse profile and inventory summary — operational view</p>
+        </div>
+        <div>
+            <a asp-controller="Warehouse" asp-action="Index" class="btn btn-outline-secondary">
+                &larr; Back to Warehouses List
+            </a>
+        </div>
+    </header>
+
+    <div class="row g-3">
+        <!-- Left Column: Warehouse Information (approx 60%) -->
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Warehouse Information</h5>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Name</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model?.Name</dd>
+
+                        <dt class="col-sm-4 text-muted">Type</dt>
+                        <dd class="col-sm-8">@Model?.Type.ToString()</dd>
+
+                        <dt class="col-sm-4 text-muted">Address</dt>
+                        <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model?.Address) ? Model.Address : "—")</dd>
+
+                        <dt class="col-sm-4 text-muted">Capacity</dt>
+                        <dd class="col-sm-8 fw-semibold">@((Model != null) ? Model.Capacity.ToString() : "—")</dd>
+
+                        <dt class="col-sm-4 text-muted">Phone</dt>
+                        <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model?.Phone) ? @Html.Raw("<a href=\"tel:" + Model.Phone + "\" class=\"text-decoration-none\">" + Model.Phone + "</a>") : "—")</dd>
+
+                        <dt class="col-sm-4 text-muted">Email</dt>
+                        <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model?.Email) ? @Html.Raw("<a href=\"mailto:" + Model.Email + "\" class=\"text-decoration-none\">" + Model.Email + "</a>") : "—")</dd>
+
+                        <dt class="col-sm-4 text-muted">Manager</dt>
+                        <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model?.Manager) ? Model.Manager : "—")</dd>
+
+                        <dt class="col-sm-4 text-muted">Opened</dt>
+                        <dd class="col-sm-8">@((Model != null) ? Model.OpeningDate.ToString("dd MMM yyyy") : "—")</dd>
+
+                        <dt class="col-sm-4 text-muted">Status</dt>
+                        <dd class="col-sm-8">
+                            @if (Model != null && Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Summary Metrics (approx 40%) -->
+        <div class="col-12 col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h6 class="text-muted mb-3">Summary Metrics</h6>
+
+                    <div class="mb-3">
+                        <div class="small text-muted">Total Inventory Items</div>
+                        <div class="h4 fw-semibold">@totalQuantity</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="small text-muted">Unique SKUs</div>
+                        <div class="h5 fw-semibold">@itemCount</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="small text-muted">Capacity Utilization</div>
+                        <div class="d-flex align-items-center">
+                            <div class="progress flex-grow-1 me-2" style="height:10px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width:@(Math.Min(100, capacityUtil))%" aria-valuenow="@(capacityUtil)" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="text-end fw-semibold">@capacityUtil% </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="mt-auto text-muted small">
+                        <div>Warehouse ID: <strong>@Model?.Id</strong></div>
+                        <div class="mt-1">Last update: <strong>@DateTime.Now.ToString("dd MMM yyyy HH:mm")</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Operational Notes</h6>
+                    <p class="mb-0 text-muted">Read-only profile. Use inventory operations to adjust stock or record audits.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Items Full-width Section -->
+    <section class="mt-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Inventory Items</h5>
+                    <small class="text-muted">@((itemCount) + " records")</small>
+                </div>
+
+                @if (items != null && items.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-center">Min</th>
+                                    <th class="text-center">Max</th>
+                                    <th>Shelf</th>
+                                    <th class="text-nowrap">Last Checked</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in items)
+                                {
+                                    var productName = item?.Product?.Name ?? "—";
+                                    var qty = item?.QuantityInStock ?? 0;
+                                    var min = item?.MinimumQuantity ?? 0;
+                                    var max = item?.MaximumQuantity ?? 0;
+                                    var lastChecked = item?.LastCheckedAt ?? DateTime.MinValue;
+
+                                    string levelBadge;
+                                    string badgeClass;
+                                    if (qty < min)
+                                    {
+                                        levelBadge = "Critical"; badgeClass = "bg-danger";
+                                    }
+                                    else if (max > 0 && qty >= max)
+                                    {
+                                        levelBadge = "At/Above Max"; badgeClass = "bg-warning text-dark";
+                                    }
+                                    else
+                                    {
+                                        levelBadge = "OK"; badgeClass = "bg-success";
+                                    }
+
+                                    // recency
+                                    var daysOld = (DateTime.Now - lastChecked).TotalDays;
+                                    string recencyClass = "bg-secondary";
+                                    string recencyText = lastChecked == DateTime.MinValue ? "Never" : lastChecked.ToString("dd MMM yyyy");
+                                    if (lastChecked != DateTime.MinValue)
+                                    {
+                                        if (daysOld <= 7) { recencyClass = "bg-success"; }
+                                        else if (daysOld <= 30) { recencyClass = "bg-warning text-dark"; }
+                                        else { recencyClass = "bg-secondary"; }
+                                    }
+
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">
+                                                @if (item?.Product != null)
+                                                {
+                                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@item.Product.Id" class="text-decoration-none">@productName</a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">@productName</span>
+                                                }
+                                            </div>
+                                            @if (!string.IsNullOrWhiteSpace(item?.Product?.Description))
+                                            {
+                                                <div class="text-muted small">@item.Product.Description</div>
+                                            }
+                                        </td>
+                                        <td class="text-center fw-semibold">@qty</td>
+                                        <td class="text-center">@min</td>
+                                        <td class="text-center">@max</td>
+                                        <td>@(!string.IsNullOrWhiteSpace(item?.ShelfLocation) ? item.ShelfLocation : "—")</td>
+                                        <td class="text-nowrap">
+                                            @if (lastChecked != DateTime.MinValue)
+                                            {
+                                                <span class="small text-muted">@lastChecked.ToString("dd MMM yyyy HH:mm")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted small">—</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <span class="badge @badgeClass">@levelBadge</span>
+                                                <small class="mt-1 badge @recencyClass">@recencyText</small>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <p class="mb-2 text-muted">No inventory items are recorded for this warehouse.</p>
+                        <p class="mb-0"><small class="text-muted">Use inventory management tools to add and audit stock.</small></p>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Navigation -->
+    <footer class="mt-4 d-flex justify-content-between align-items-center">
+        <div class="text-muted small">Page generated: @DateTime.Now.ToString("dd MMM yyyy HH:mm")</div>
+        <div>
+            <a asp-controller="Warehouse" asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Warehouses List</a>
+        </div>
+    </footer>
+</div>

@@ -1,0 +1,178 @@
+@using System.Linq
+@using InventoryManagement.Domain.Models
+@using InventoryManagement.Domain.Enums
+@model IEnumerable<User>
+
+@{
+    ViewData["Title"] = "Users";
+    var users = Model?.ToList() ?? new List<User>();
+    var totalUsers = users.Count;
+    var administrators = users.Count(u => u.Role == UserRole.Administrator);
+    var employees = users.Count(u => u.Role == UserRole.Employee);
+    var customers = users.Count(u => u.Role == UserRole.Customer);
+    var activeUsers = users.Count(u => u.IsActive);
+    var inactiveUsers = totalUsers - activeUsers;
+
+    Func<UserRole, string> RoleBadgeClass = r => r == UserRole.Administrator ? "bg-danger" : r == UserRole.Employee ? "bg-info text-dark" : "bg-success";
+    Func<bool, string> StatusBadgeClass = a => a ? "bg-success" : "bg-secondary";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb bg-transparent p-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Users</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h1 class="h3 mb-1">Users</h1>
+        <p class="text-muted mb-0">User and team management — view access, activity, and order history for system users.</p>
+    </div>
+    <div class="text-end">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-outline-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="card-subtitle text-muted">Total Users</h6>
+                <div class="d-flex align-items-baseline">
+                    <span class="display-6 fw-bold me-2">@totalUsers</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="card-subtitle text-muted">Administrators</h6>
+                <div class="d-flex align-items-baseline">
+                    <span class="h4 fw-semibold text-danger me-2">@administrators</span>
+                    <small class="text-muted">accounts</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="card-subtitle text-muted">Employees</h6>
+                <div class="d-flex align-items-baseline">
+                    <span class="h4 fw-semibold text-info me-2">@employees</span>
+                    <small class="text-muted">accounts</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="card-subtitle text-muted">Customers</h6>
+                <div class="d-flex align-items-baseline">
+                    <span class="h4 fw-semibold text-success me-2">@customers</span>
+                    <small class="text-muted">accounts</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12 col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="card-subtitle text-muted">Active Users</h6>
+                    <div class="h5 mb-0">@activeUsers</div>
+                </div>
+                <div class="text-end">
+                    <span class="badge @StatusBadgeClass(true) me-2">Active</span>
+                    <span class="badge @StatusBadgeClass(false)">Inactive: @inactiveUsers</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!users.Any())
+{
+    <div class="card border-0 shadow-sm p-4 text-center">
+        <div class="mb-3">
+            <h4 class="mb-1">No users found</h4>
+            <p class="text-muted mb-0">There are currently no users in the system. Once users register or are added, they will appear here.</p>
+        </div>
+        <div>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Return to Dashboard</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted small">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Role</th>
+                            <th scope="col">Registered</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="text-end">Orders</th>
+                            <th scope="col" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in users)
+                        {
+                            var fullName = string.Join(" ", new[] { user.FirstName?.Trim(), user.LastName?.Trim() }.Where(s => !string.IsNullOrWhiteSpace(s)));
+                            var email = string.IsNullOrWhiteSpace(user.Email) ? "—" : user.Email;
+                            var regDate = user.RegistrationDate == default ? "—" : user.RegistrationDate.ToString("MMM d, yyyy");
+                            var orderCount = user.Orders?.Count ?? 0;
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@(!string.IsNullOrWhiteSpace(fullName) ? fullName : "Unnamed User")</div>
+                                <div class="small text-muted">ID: @user.Id</div>
+                            </td>
+                            <td>
+                                @if (email != "—")
+                                {
+                                    <a href="mailto:@user.Email">@user.Email</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @RoleBadgeClass(user.Role)">@user.Role.ToString()</span>
+                            </td>
+                            <td>
+                                <span class="small text-muted">@regDate</span>
+                            </td>
+                            <td>
+                                <span class="badge @StatusBadgeClass(user.IsActive)">@(user.IsActive ? "Active" : "Inactive")</span>
+                            </td>
+                            <td class="text-end fw-semibold">@orderCount</td>
+                            <td class="text-end">
+                                <a asp-controller="User" asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+<footer class="mt-4 d-flex justify-content-between align-items-center small text-muted">
+    <div>Last updated: @DateTime.Now.ToString("f")</div>
+    <div>
+        <a asp-controller="Home" asp-action="Index" class="text-decoration-none">Back to Dashboard</a>
+    </div>
+</footer>
