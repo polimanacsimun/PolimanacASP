@@ -1,8 +1,548 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
+    ViewData["HideMainNav"] = true;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<style>
+    .dashboard-shell {
+        background: linear-gradient(180deg, #eef5ff 0%, #f8fbff 45%, #ffffff 100%);
+        border-radius: 1rem;
+    }
+
+    .hero {
+        background: linear-gradient(135deg, #0d6efd 0%, #4f46e5 55%, #14b8a6 100%);
+        color: #fff;
+        border-radius: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero::before,
+    .hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        opacity: .15;
+        pointer-events: none;
+    }
+
+    .hero::before {
+        width: 220px;
+        height: 220px;
+        right: -60px;
+        top: -60px;
+        background: #fff;
+    }
+
+    .hero::after {
+        width: 160px;
+        height: 160px;
+        left: -40px;
+        bottom: -40px;
+        background: #fff;
+    }
+
+    .hero-logo {
+        width: 72px;
+        height: 72px;
+        border-radius: 1rem;
+        background: rgba(255,255,255,.16);
+        border: 1px solid rgba(255,255,255,.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(2px);
+        box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .4rem .75rem;
+        background: rgba(255,255,255,.16);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,.22);
+        border-radius: 999px;
+        font-size: .85rem;
+        font-weight: 600;
+    }
+
+    .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: .35rem .7rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,.15);
+        border: 1px solid rgba(255,255,255,.18);
+        font-size: .85rem;
+        margin-right: .5rem;
+        margin-bottom: .5rem;
+    }
+
+    .card-hover {
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        cursor: pointer;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    }
+
+    .kpi-card {
+        border: 0;
+        border-radius: .9rem;
+        color: #1f2937;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .kpi-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 5px;
+        border-radius: .9rem 0 0 .9rem;
+    }
+
+    .kpi-products { background: #eef4ff; }
+    .kpi-products::before { background: #0d6efd; }
+
+    .kpi-suppliers { background: #ecfeff; }
+    .kpi-suppliers::before { background: #06b6d4; }
+
+    .kpi-capacity { background: #ecfdf5; }
+    .kpi-capacity::before { background: #10b981; }
+
+    .kpi-users { background: #f5f3ff; }
+    .kpi-users::before { background: #8b5cf6; }
+
+    .kpi-orders { background: #fff7ed; }
+    .kpi-orders::before { background: #f97316; }
+
+    .kpi-status { background: #fffbeb; }
+    .kpi-status::before { background: #eab308; }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        line-height: 1.1;
+    }
+
+    .stat-label {
+        font-size: .9rem;
+        color: #6b7280;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: .85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+    }
+
+    .icon-products { background: linear-gradient(135deg, #0d6efd, #60a5fa); }
+    .icon-suppliers { background: linear-gradient(135deg, #06b6d4, #67e8f9); }
+    .icon-capacity { background: linear-gradient(135deg, #10b981, #6ee7b7); }
+    .icon-users { background: linear-gradient(135deg, #8b5cf6, #c4b5fd); }
+    .icon-orders { background: linear-gradient(135deg, #f97316, #fdba74); }
+    .icon-status { background: linear-gradient(135deg, #eab308, #fde68a); }
+
+    .module-card {
+    border: 0;
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+    min-height: 100%;
+}
+
+.module-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 6px;
+    z-index: 1;
+}
+
+.module-card .card-body {
+    position: relative;
+    z-index: 2;
+    padding: 1.25rem 1.25rem 1.25rem 1.5rem; /* više lijevog paddinga */
+    min-height: 160px;
+}
+
+.module-products { background: #f8fbff; }
+.module-products::before { background: #0d6efd; }
+
+.module-suppliers { background: #f4fdff; }
+.module-suppliers::before { background: #06b6d4; }
+
+.module-categories { background: #faf7ff; }
+.module-categories::before { background: #8b5cf6; }
+
+.module-warehouses { background: #f3fcf8; }
+.module-warehouses::before { background: #10b981; }
+
+.module-users { background: #fff9f0; }
+.module-users::before { background: #f59e0b; }
+
+.module-orders { background: #fff5f5; }
+.module-orders::before { background: #ef4444; }
+
+.module-badge {
+    font-size: .7rem;
+    padding: .3rem .55rem;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.module-link-row {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+}
+
+.module-link-row .arrow {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+    .mini-note {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: .9rem;
+    }
+
+    .focus-ring {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .15);
+        border-radius: 1rem;
+    }
+</style>
+
+<section class="dashboard-shell p-3 p-md-4">
+    <!-- Hero / Welcome -->
+    <header class="hero p-4 p-lg-5 mb-4 shadow-sm">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start">
+            <div class="me-lg-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="hero-logo" aria-hidden="true">
+                        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="4" width="18" height="4" rx="1.2" fill="white" fill-opacity=".95"/>
+                            <rect x="3" y="10" width="18" height="4" rx="1.2" fill="white" fill-opacity=".85"/>
+                            <rect x="3" y="16" width="11" height="4" rx="1.2" fill="white" fill-opacity=".75"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="hero-badge">
+                            <span>●</span>
+                            <span>Inventory Management</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h1 class="display-5 fw-bold mb-2">Operations Dashboard</h1>
+                <p class="lead mb-3">
+                    Centralized overview of products, suppliers, warehouses, users, and orders —
+                    designed for day-to-day inventory monitoring and business workflows.
+                </p>
+
+                <div class="mb-3">
+                    <span class="hero-chip">Live snapshot</span>
+                    <span class="hero-chip">Read-only mock data</span>
+                    <span class="hero-chip">Custom UX</span>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <a class="btn btn-light btn-sm px-3" asp-controller="Product" asp-action="Index">View Catalog</a>
+                    <a class="btn btn-outline-light btn-sm px-3" asp-controller="Order" asp-action="Index">Review Orders</a>
+                    <a class="btn btn-outline-light btn-sm px-3" asp-controller="User" asp-action="Index">Team</a>
+                </div>
+            </div>
+
+            <div class="mt-4 mt-lg-0 text-lg-end">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb bg-transparent justify-content-lg-end p-0 mb-0">
+                        <li class="breadcrumb-item active text-white-50" aria-current="page">Dashboard</li>
+                    </ol>
+                </nav>
+
+                <div class="mini-note p-3 shadow-sm d-inline-block text-start">
+                    <div class="small text-muted">System Status</div>
+                    <div class="fw-semibold text-success mb-1">Healthy</div>
+                    <div class="small text-muted">All modules available</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Key Metrics -->
+    <section class="mb-5" aria-labelledby="kpi-heading">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 id="kpi-heading" class="h5 mb-0">Key Metrics</h2>
+            <span class="small text-muted">At-a-glance overview</span>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-12 col-sm-6 col-xl-4">
+                <article class="card kpi-card kpi-products card-hover h-100 shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon icon-products">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="3" width="7" height="7" rx="1" fill="#fff"/>
+                                <rect x="14" y="3" width="7" height="7" rx="1" fill="#e0ecff"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1" fill="#c7ddff"/>
+                                <rect x="14" y="14" width="7" height="7" rx="1" fill="#fff"/>
+                            </svg>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="stat-label">Total Products</div>
+                            <div class="stat-value">@((ViewBag.TotalProducts ?? "—"))</div>
+                            <div class="small text-muted">Catalog items tracked</div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-4">
+                <article class="card kpi-card kpi-suppliers card-hover h-100 shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon icon-suppliers">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="8" r="3.5" fill="#fff"/>
+                                <path d="M4 20c0-4 4-6 8-6s8 2 8 6" fill="#cffafe"/>
+                            </svg>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="stat-label">Active Suppliers</div>
+                            <div class="stat-value">@((ViewBag.ActiveSuppliers ?? "—"))</div>
+                            <div class="small text-muted">Available partners</div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-4">
+                <article class="card kpi-card kpi-capacity card-hover h-100 shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon icon-capacity">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="6" width="18" height="12" rx="2" fill="#fff"/>
+                                <path d="M3 12h18" stroke="#a7f3d0" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="stat-label">Warehouse Capacity</div>
+                            <div class="stat-value">@((ViewBag.WarehouseCapacity ?? "—"))</div>
+                            <div class="small text-muted">Storage units</div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-4">
+                <article class="card kpi-card kpi-users card-hover h-100 shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon icon-users">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="8" r="3.5" fill="#fff"/>
+                                <path d="M4 20c0-4 4-6 8-6s8 2 8 6" fill="#ede9fe"/>
+                            </svg>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="stat-label">Total Users</div>
+                            <div class="stat-value">@((ViewBag.TotalUsers ?? "—"))</div>
+                            <div class="small text-muted">System accounts</div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-4">
+                <article class="card kpi-card kpi-orders card-hover h-100 shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon icon-orders">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="4" y="4" width="16" height="16" rx="2" fill="#fff"/>
+                                <path d="M8 9h8M8 13h8M8 17h5" stroke="#fed7aa" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="stat-label">Recent Orders</div>
+                            <div class="stat-value">@((ViewBag.RecentOrders ?? "—"))</div>
+                            <div class="small text-muted">Loaded from repository</div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-4">
+                <article class="card kpi-card kpi-status card-hover h-100 shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon icon-status">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="9" fill="#fff3bf"/>
+                                <path d="M12 7v5l3 2" stroke="#7c5a00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="stat-label">System Status</div>
+                            <div class="stat-value text-success">Healthy</div>
+                            <div class="small text-muted">Operational</div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Modules Navigation -->
+    <section class="mb-4" aria-labelledby="modules-heading">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 id="modules-heading" class="h5 mb-0">System Modules</h2>
+        <span class="small text-muted">Quick access to all main areas</span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-md-6 col-xl-4">
+            <article class="module-card module-products card-hover shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-start justify-content-between mb-2 gap-2">
+                        <div>
+                            <h3 class="h6 mb-1">Products</h3>
+                            <div class="text-muted small">Manage catalog, product information and stock thresholds.</div>
+                        </div>
+                        <span class="badge bg-primary module-badge">Catalog</span>
+                    </div>
+                    <div class="module-link-row">
+                        <a class="stretched-link text-decoration-none" asp-controller="Product" asp-action="Index">Go to Products</a>
+                        <span class="arrow text-primary">→</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4">
+            <article class="module-card module-suppliers card-hover shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-start justify-content-between mb-2 gap-2">
+                        <div>
+                            <h3 class="h6 mb-1">Suppliers</h3>
+                            <div class="text-muted small">Vendor management, contact details and procurement oversight.</div>
+                        </div>
+                        <span class="badge bg-info text-dark module-badge">Vendors</span>
+                    </div>
+                    <div class="module-link-row">
+                        <a class="stretched-link text-decoration-none" asp-controller="Supplier" asp-action="Index">Go to Suppliers</a>
+                        <span class="arrow text-info">→</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4">
+            <article class="module-card module-categories card-hover shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-start justify-content-between mb-2 gap-2">
+                        <div>
+                            <h3 class="h6 mb-1">Categories</h3>
+                            <div class="text-muted small">Product grouping, taxonomy and catalog organization.</div>
+                        </div>
+                        <span class="badge bg-secondary module-badge">Taxonomy</span>
+                    </div>
+                    <div class="module-link-row">
+                        <a class="stretched-link text-decoration-none" asp-controller="Category" asp-action="Index">Go to Categories</a>
+                        <span class="arrow text-secondary">→</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4">
+            <article class="module-card module-warehouses card-hover shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-start justify-content-between mb-2 gap-2">
+                        <div>
+                            <h3 class="h6 mb-1">Warehouses</h3>
+                            <div class="text-muted small">Storage locations, capacity and inventory allocation.</div>
+                        </div>
+                        <span class="badge bg-success module-badge">Logistics</span>
+                    </div>
+                    <div class="module-link-row">
+                        <a class="stretched-link text-decoration-none" asp-controller="Warehouse" asp-action="Index">Go to Warehouses</a>
+                        <span class="arrow text-success">→</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4">
+            <article class="module-card module-users card-hover shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-start justify-content-between mb-2 gap-2">
+                        <div>
+                            <h3 class="h6 mb-1">Users</h3>
+                            <div class="text-muted small">Accounts, roles and user activity management.</div>
+                        </div>
+                        <span class="badge bg-warning text-dark module-badge">Admin</span>
+                    </div>
+                    <div class="module-link-row">
+                        <a class="stretched-link text-decoration-none" asp-controller="User" asp-action="Index">Go to Users</a>
+                        <span class="arrow text-warning">→</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4">
+            <article class="module-card module-orders card-hover shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-start justify-content-between mb-2 gap-2">
+                        <div>
+                            <h3 class="h6 mb-1">Orders</h3>
+                            <div class="text-muted small">Purchase orders, fulfillment and delivery tracking.</div>
+                        </div>
+                        <span class="badge bg-danger module-badge">Fulfillment</span>
+                    </div>
+                    <div class="module-link-row">
+                        <a class="stretched-link text-decoration-none" asp-controller="Order" asp-action="Index">Go to Orders</a>
+                        <span class="arrow text-danger">→</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+    <!-- Footer / About -->
+    <footer class="border-top pt-3 mt-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-muted">
+            <div>Inventory Management • Custom dashboard for Lab 2</div>
+            <div class="mt-2 mt-md-0">
+                <a class="me-3 text-decoration-none" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                <span class="badge bg-dark-subtle text-dark">v1.0</span>
+            </div>
+        </div>
+    </footer>
+</section>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.card-hover a.stretched-link').forEach(function (el) {
+            el.addEventListener('focus', function () {
+                el.closest('.card-hover')?.classList.add('focus-ring');
+            });
+            el.addEventListener('blur', function () {
+                el.closest('.card-hover')?.classList.remove('focus-ring');
+            });
+        });
+    </script>
+}

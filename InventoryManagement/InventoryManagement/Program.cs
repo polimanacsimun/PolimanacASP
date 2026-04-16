@@ -9,6 +9,7 @@ builder.Services.AddSingleton<SupplierMockRepository>();
 builder.Services.AddSingleton<CategoryMockRepository>();
 builder.Services.AddSingleton<WarehouseMockRepository>();
 builder.Services.AddSingleton<UserMockRepository>();
+builder.Services.AddSingleton<OrderMockRepository>();
 
 var app = builder.Build();
 

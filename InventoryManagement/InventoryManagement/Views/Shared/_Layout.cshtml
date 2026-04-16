@@ -2,49 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - InventoryManagement</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Inventory Management</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/InventoryManagement.styles.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --brand-accent: #0d6efd;
+            --header-bg: #f8fafc;
+            --muted-border: #e7ecef;
+            --brand-text: #162029;
+        }
+
+        .site-header {
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--muted-border);
+        }
+
+        .brand-title {
+            font-weight: 600;
+            color: var(--brand-text);
+            letter-spacing: 0.2px;
+        }
+
+        .nav-link.active {
+            color: var(--brand-accent) !important;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .nav-sep {
+            height: 28px;
+            width: 1px;
+            background-color: var(--muted-border);
+            margin: 0 0.75rem;
+        }
+
+        footer.site-footer {
+            background-color: #fbfcfd;
+            border-top: 1px solid var(--muted-border);
+        }
+
+        @@media (max-width: 991px) {
+            .nav-sep {
+                display: none;
+            }
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+
+@{
+    var hideMainNav = ViewData["HideMainNav"] is bool value && value;
+}
+
+<body class="d-flex flex-column min-vh-100">
+    @if (!hideMainNav)
+    {
+        <header class="site-header py-2">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">InventoryManagement</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+                <nav class="navbar navbar-expand-lg p-0 align-items-center" aria-label="Main navigation">
+                    <a class="navbar-brand d-flex align-items-center me-3" asp-controller="Home" asp-action="Index">
+                        <div class="me-2" style="width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#0d6efd22,#0d6efd11);display:flex;align-items:center;justify-content:center">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M4 7h16" stroke="#0d6efd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 12h16" stroke="#0d6efd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 17h10" stroke="#0d6efd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="brand-title">Inventory Management</span>
+                            <small class="text-muted">Operations & Inventory Dashboard</small>
+                        </div>
+                    </a>
+
+                    <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    @{
+                        Func<string, string> active = controller =>
+                            string.Equals(
+                                ViewContext.RouteData.Values["controller"]?.ToString() ?? "",
+                                controller,
+                                StringComparison.OrdinalIgnoreCase)
+                            ? "active"
+                            : "";
+                    }
+
+                    <div class="collapse navbar-collapse" id="mainNav">
+                        <ul class="navbar-nav align-items-lg-center me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link @active("Home")" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @active("Product")" asp-controller="Product" asp-action="Index">Products</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @active("Supplier")" asp-controller="Supplier" asp-action="Index">Suppliers</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @active("Category")" asp-controller="Category" asp-action="Index">Categories</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @active("Warehouse")" asp-controller="Warehouse" asp-action="Index">Warehouses</a>
+                            </li>
+
+                            <li class="nav-sep d-none d-lg-block" role="presentation" aria-hidden="true"></li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @active("User")" asp-controller="User" asp-action="Index">Users</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @active("Order")" asp-controller="Order" asp-action="Index">Orders</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </header>
+    }
+
+    <main role="main" class="flex-grow-1 py-4">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">@ViewData["Title"]</h2>
+                <div class="text-muted small">
+                    <span class="me-2">Status: <strong class="text-success">Operational</strong></span>
+                    <span class="d-none d-md-inline">| Last updated: @DateTime.Now.ToString("yyyy-MM-dd")</span>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - InventoryManagement - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <section class="bg-white p-3 rounded shadow-sm">
+                @RenderBody()
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer mt-auto py-3">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center small text-muted">
+            <div>&copy; @DateTime.Now.Year Inventory Management</div>
+            <div class="mt-2 mt-md-0">Designed for enterprise inventory & operations — Confidential</div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
