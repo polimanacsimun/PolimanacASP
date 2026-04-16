@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="InventoryManagement.Console/InventoryManagement.Console.csproj" Id="f5ac8439-96bd-4b31-921f-a9e763d56c96" />
+  <Project Path="InventoryManagement.Domain/InventoryManagement.Domain.csproj" Id="bd0f3fc2-28a9-4442-8591-2aebd5615e9e" />
   <Project Path="InventoryManagement/InventoryManagement.csproj" />
 </Solution>

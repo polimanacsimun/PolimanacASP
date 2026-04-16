@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InventoryManagement.Console.Models
+namespace InventoryManagement.Domain.Models
 {
     public class OrderItem
     {

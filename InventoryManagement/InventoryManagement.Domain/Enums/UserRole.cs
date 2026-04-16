@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InventoryManagement.Console.Enums
+namespace InventoryManagement.Domain.Enums
 {
     public enum UserRole
     {

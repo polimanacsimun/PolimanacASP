@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InventoryManagement.Console.Enums;
-using InventoryManagement.Console.Models;
+using InventoryManagement.Domain.Enums;
+using InventoryManagement.Domain.Models;
 
 namespace InventoryManagement.Console
 {

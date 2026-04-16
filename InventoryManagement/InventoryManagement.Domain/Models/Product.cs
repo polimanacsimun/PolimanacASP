@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using InventoryManagement.Console.Enums;
+using InventoryManagement.Domain.Enums;
 
-namespace InventoryManagement.Console.Models
+namespace InventoryManagement.Domain.Models
 {
     public class Product
     {

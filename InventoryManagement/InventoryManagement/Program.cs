@@ -1,7 +1,10 @@
+using InventoryManagement.Repositories.Mock;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<ProductMockRepository>();
 
 var app = builder.Build();
 

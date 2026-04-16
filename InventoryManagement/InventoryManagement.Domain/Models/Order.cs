@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using InventoryManagement.Console.Enums;
+using InventoryManagement.Domain.Enums;
 
-namespace InventoryManagement.Console.Models
+namespace InventoryManagement.Domain.Models
 {
     public class Order
     {
