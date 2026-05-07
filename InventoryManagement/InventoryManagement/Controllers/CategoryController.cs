@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using InventoryManagement.Repositories.Mock;
+using InventoryManagement.DAL.Repositories;
 
 namespace InventoryManagement.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly CategoryMockRepository _repository;
+        private readonly CategoryEfRepository _repository;
 
-        public CategoryController(CategoryMockRepository repository)
+        public CategoryController(CategoryEfRepository repository)
         {
             _repository = repository;
         }

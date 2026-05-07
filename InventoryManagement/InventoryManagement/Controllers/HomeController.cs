@@ -1,5 +1,5 @@
 using InventoryManagement.Models;
-using InventoryManagement.Repositories.Mock;
+using InventoryManagement.DAL.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Linq;
@@ -9,19 +9,19 @@ namespace InventoryManagement.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ProductMockRepository _productRepository;
-        private readonly SupplierMockRepository _supplierRepository;
-        private readonly WarehouseMockRepository _warehouseRepository;
-        private readonly UserMockRepository _userRepository;
-        private readonly OrderMockRepository _orderRepository;
+        private readonly ProductEfRepository _productRepository;
+         private readonly SupplierEfRepository _supplierRepository;
+        private readonly WarehouseEfRepository _warehouseRepository;
+        private readonly UserEfRepository _userRepository;
+        private readonly OrderEfRepository _orderRepository;
 
         public HomeController(
             ILogger<HomeController> logger,
-            ProductMockRepository productRepository,
-            SupplierMockRepository supplierRepository,
-            WarehouseMockRepository warehouseRepository,
-            UserMockRepository userRepository,
-            OrderMockRepository orderRepository)
+            ProductEfRepository productRepository,
+            SupplierEfRepository supplierRepository,
+            WarehouseEfRepository warehouseRepository,
+            UserEfRepository userRepository,
+            OrderEfRepository orderRepository)
         {
             _logger = logger;
             _productRepository = productRepository;

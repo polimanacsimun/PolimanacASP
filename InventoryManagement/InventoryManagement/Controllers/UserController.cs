@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using InventoryManagement.Repositories.Mock;
+using InventoryManagement.DAL.Repositories;
 
 namespace InventoryManagement.Controllers
 {
     public class UserController : Controller
     {
-        private readonly UserMockRepository _repository;
+        private readonly UserEfRepository _repository;
 
-        public UserController(UserMockRepository repository)
+        public UserController(UserEfRepository repository)
         {
             _repository = repository;
         }

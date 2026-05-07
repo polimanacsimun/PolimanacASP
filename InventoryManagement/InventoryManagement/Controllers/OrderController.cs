@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using InventoryManagement.Repositories.Mock;
+using InventoryManagement.DAL.Repositories;
 
 namespace InventoryManagement.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly OrderMockRepository _repository;
+        private readonly OrderEfRepository _repository;
 
-        public OrderController(OrderMockRepository repository)
+        public OrderController(OrderEfRepository repository)
         {
             _repository = repository;
         }

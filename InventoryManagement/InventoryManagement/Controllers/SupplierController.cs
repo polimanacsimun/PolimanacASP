@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using InventoryManagement.Repositories.Mock;
+using InventoryManagement.DAL.Repositories;
 
 namespace InventoryManagement.Controllers
 {
     public class SupplierController : Controller
     {
-        private readonly SupplierMockRepository _repository;
+        private readonly SupplierEfRepository _repository;
 
-        public SupplierController(SupplierMockRepository repository)
+        public SupplierController(SupplierEfRepository repository)
         {
             _repository = repository;
         }

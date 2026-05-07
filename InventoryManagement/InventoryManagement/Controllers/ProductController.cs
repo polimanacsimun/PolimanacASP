@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
-using InventoryManagement.Repositories.Mock;
+using InventoryManagement.DAL.Repositories;
 
 namespace InventoryManagement.Controllers
 {
     public class ProductController : Controller
     {
-        private readonly ProductMockRepository _repository;
+        private readonly ProductEfRepository _repository;
 
-        public ProductController(ProductMockRepository repository)
-        {
-            _repository = repository;
-        }
+public ProductController(ProductEfRepository repository)
+{
+    _repository = repository;
+}
 
         public IActionResult Index()
         {
