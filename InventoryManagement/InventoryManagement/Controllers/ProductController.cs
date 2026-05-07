@@ -12,14 +12,18 @@ public ProductController(ProductEfRepository repository)
     _repository = repository;
 }
 
-        [Route("/catalog")]
+        [Route("catalog", Name = "ProductCatalog")]
+        [Route("Product")]
+        [Route("Product/Index")]        
         public IActionResult Index()
         {
             var products = _repository.GetAll();
             return View(products);
         }
 
-        [Route("/catalog/{id:int}")]
+        
+[Route("Product/Details/{id:int}")]
+[Route("catalog/{id:int}", Name = "ProductCatalogDetails")]
         public IActionResult Details(int id)
         {
             var product = _repository.GetById(id);

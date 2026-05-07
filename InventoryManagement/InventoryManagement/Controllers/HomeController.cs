@@ -31,6 +31,10 @@ namespace InventoryManagement.Controllers
             _orderRepository = orderRepository;
         }
 
+        [Route("")]
+        [Route("dashboard")]
+        [Route("Home")]
+        [Route("Home/Index")]
         public IActionResult Index()
 {
     try

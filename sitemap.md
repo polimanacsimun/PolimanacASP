@@ -18,6 +18,7 @@ The default route is still available, but custom routes are used to make selecte
 | URL | Controller | Action | View | Notes |
 |---|---|---|---|---|
 | `/` | HomeController | Index | Views/Home/Index.cshtml | Main dashboard page. |
+| `/dashboard` | HomeController | Index | Views/Home/Index.cshtml | Custom semantic dashboard route. |
 | `/Home/Index` | HomeController | Index | Views/Home/Index.cshtml | Default MVC route. |
 | `/Home/Privacy` | HomeController | Privacy | Views/Home/Privacy.cshtml | Standard privacy page. |
 | `/Home/Error` | HomeController | Error | Views/Shared/Error.cshtml | Error page. |
