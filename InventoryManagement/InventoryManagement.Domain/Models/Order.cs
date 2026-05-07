@@ -18,7 +18,7 @@ namespace InventoryManagement.Domain.Models
         public string Note { get; set; }
 
         public int UserId { get; set; }
-        [ForeignKey(nameof(User))]
+        [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; }
 
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();

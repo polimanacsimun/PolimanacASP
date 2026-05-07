@@ -18,11 +18,11 @@ namespace InventoryManagement.Domain.Models
         public DateTime CreatedAt { get; set; }
 
         public int OrderId { get; set; }
-        [ForeignKey(nameof(Order))]
+        [ForeignKey(nameof(OrderId))]
         public virtual Order Order { get; set; }
 
         public int ProductId { get; set; }
-        [ForeignKey(nameof(Product))]
+        [ForeignKey(nameof(ProductId))]
         public virtual Product Product { get; set; }
     }
 }

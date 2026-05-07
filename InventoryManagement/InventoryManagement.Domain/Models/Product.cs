@@ -20,11 +20,11 @@ namespace InventoryManagement.Domain.Models
         public ProductType Type { get; set; }
 
         public int? CategoryId { get; set; }
-        [ForeignKey(nameof(Category))]
+        [ForeignKey(nameof(CategoryId))]
         public virtual Category Category { get; set; }
 
         public int? SupplierId { get; set; }
-        [ForeignKey(nameof(Supplier))]
+        [ForeignKey(nameof(SupplierId))]
         public virtual Supplier Supplier { get; set; }
 
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
