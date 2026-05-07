@@ -1,10 +1,15 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InventoryManagement.Domain.Models
 {
+    /// <summary>
+    /// Junction entity resolving N-N relationship between Product and Warehouse
+    /// </summary>
     public class InventoryItem
     {
-        //spojna klasa koja rijesava N-N izmedju Product i Warehouse
+        [Key]
         public int Id { get; set; }
         public int QuantityInStock { get; set; }
         public int MinimumQuantity { get; set; }
@@ -12,7 +17,12 @@ namespace InventoryManagement.Domain.Models
         public string ShelfLocation { get; set; }
         public DateTime LastCheckedAt { get; set; }
 
-        public Product Product { get; set; }
-        public Warehouse Warehouse { get; set; }
+        public int ProductId { get; set; }
+        [ForeignKey(nameof(Product))]
+        public virtual Product Product { get; set; }
+
+        public int WarehouseId { get; set; }
+        [ForeignKey(nameof(Warehouse))]
+        public virtual Warehouse Warehouse { get; set; }
     }
 }

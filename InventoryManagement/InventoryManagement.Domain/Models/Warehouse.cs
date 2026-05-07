@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using InventoryManagement.Domain.Enums;
 
 namespace InventoryManagement.Domain.Models
 {
     public class Warehouse
     {
+        [Key]
         public int Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
@@ -17,11 +19,11 @@ namespace InventoryManagement.Domain.Models
         public bool IsActive { get; set; }
         public WarehouseType Type { get; set; }
 
-        public List<InventoryItem> InventoryItems { get; set; }
+        public virtual ICollection<InventoryItem> InventoryItems { get; set; } = new HashSet<InventoryItem>();
 
         public Warehouse()
         {
-            InventoryItems = new List<InventoryItem>();
+            InventoryItems = new HashSet<InventoryItem>();
         }
     }
 }

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using InventoryManagement.Domain.Enums;
 
 namespace InventoryManagement.Domain.Models
 {
     public class Order
     {
+        [Key]
         public int Id { get; set; }
         public string OrderNumber { get; set; }
         public DateTime OrderDate { get; set; }
@@ -14,13 +17,15 @@ namespace InventoryManagement.Domain.Models
         public DateTime? DeliveryDate { get; set; }
         public string Note { get; set; }
 
-        public User User { get; set; }
+        public int UserId { get; set; }
+        [ForeignKey(nameof(User))]
+        public virtual User User { get; set; }
 
-        public List<OrderItem> OrderItems { get; set; }
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
 
         public Order()
         {
-            OrderItems = new List<OrderItem>();
+            OrderItems = new HashSet<OrderItem>();
         }
     }
 }

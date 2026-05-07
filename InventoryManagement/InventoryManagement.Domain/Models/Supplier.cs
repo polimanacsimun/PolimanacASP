@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace InventoryManagement.Domain.Models
 {
     public class Supplier
     {
+        [Key]
         public int Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
@@ -16,11 +15,11 @@ namespace InventoryManagement.Domain.Models
         public string ContactPerson { get; set; }
         public DateTime RegistrationDate { get; set; }
         public bool IsActive { get; set; }
-        public List<Product> Products { get; set; }
+        public virtual ICollection<Product> Products { get; set; } = new HashSet<Product>();
 
         public Supplier()
         {
-            Products = new List<Product>();
+            Products = new HashSet<Product>();
         }
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using InventoryManagement.Domain.Enums;
 
 namespace InventoryManagement.Domain.Models
 {
     public class Product
     {
+        [Key]
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -19,16 +19,21 @@ namespace InventoryManagement.Domain.Models
         public bool IsActive { get; set; }
         public ProductType Type { get; set; }
 
-        public Category Category { get; set; }
-        public Supplier Supplier { get; set; }
+        public int? CategoryId { get; set; }
+        [ForeignKey(nameof(Category))]
+        public virtual Category Category { get; set; }
 
-        public List<OrderItem> OrderItems { get; set; }
-        public List<InventoryItem> InventoryItems { get; set; }
+        public int? SupplierId { get; set; }
+        [ForeignKey(nameof(Supplier))]
+        public virtual Supplier Supplier { get; set; }
+
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
+        public virtual ICollection<InventoryItem> InventoryItems { get; set; } = new HashSet<InventoryItem>();
 
         public Product()
         {
-            OrderItems = new List<OrderItem>();
-            InventoryItems = new List<InventoryItem>();
+            OrderItems = new HashSet<OrderItem>();
+            InventoryItems = new HashSet<InventoryItem>();
         }
     }
 }
