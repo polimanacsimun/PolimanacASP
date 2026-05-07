@@ -12,12 +12,14 @@ public ProductController(ProductEfRepository repository)
     _repository = repository;
 }
 
+        [Route("/catalog")]
         public IActionResult Index()
         {
             var products = _repository.GetAll();
             return View(products);
         }
 
+        [Route("/catalog/{id:int}")]
         public IActionResult Details(int id)
         {
             var product = _repository.GetById(id);

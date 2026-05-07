@@ -12,12 +12,14 @@ namespace InventoryManagement.Controllers
             _repository = repository;
         }
 
+        [Route("/categories")]
         public IActionResult Index()
         {
             var categories = _repository.GetAll();
             return View(categories);
         }
 
+        [Route("/categories/{id:int}")]
         public IActionResult Details(int id)
         {
             var category = _repository.GetById(id);
