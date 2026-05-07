@@ -1,3 +1,5 @@
+using InventoryManagement.DAL;
+using Microsoft.EntityFrameworkCore;
 using InventoryManagement.Repositories.Mock;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,10 @@ builder.Services.AddSingleton<CategoryMockRepository>();
 builder.Services.AddSingleton<WarehouseMockRepository>();
 builder.Services.AddSingleton<UserMockRepository>();
 builder.Services.AddSingleton<OrderMockRepository>();
+
+builder.Services.AddDbContext<InventoryManagementDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("InventoryManagementDbContext")));
 
 var app = builder.Build();
 
