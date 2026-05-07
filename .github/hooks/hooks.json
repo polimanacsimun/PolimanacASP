@@ -3,13 +3,13 @@
     "UserPromptSubmit": [
       {
         "type": "command",
-        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"[Console]::InputEncoding = [System.Text.Encoding]::UTF8; [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; [Console]::In.ReadToEnd() | Add-Content -Path 'C:\\Users\\simunnn\\Desktop\\asp\\PolimanacASP\\lab-1\\agentLog.txt' -Encoding UTF8\""
+        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"[Console]::InputEncoding = [System.Text.Encoding]::UTF8; [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; [Console]::In.ReadToEnd() | Add-Content -Path 'C:\\Users\\simunnn\\Desktop\\asp\\PolimanacASP\\.github\\hooks\\agent_log.txt' -Encoding UTF8\""
       }
     ],
     "preToolUse": [
       {
         "type": "command",
-        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"[Console]::InputEncoding = [System.Text.Encoding]::UTF8; [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; [Console]::In.ReadToEnd() | Add-Content -Path 'C:\\Users\\simunnn\\Desktop\\asp\\PolimanacASP\\lab-1\\agentLog.txt' -Encoding UTF8\""
+        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"[Console]::InputEncoding = [System.Text.Encoding]::UTF8; [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; [Console]::In.ReadToEnd() | Add-Content -Path 'C:\\Users\\simunnn\\Desktop\\asp\\PolimanacASP\\.github\\hooks\\agent_log.txt' -Encoding UTF8\""
       }
     ]
   }
