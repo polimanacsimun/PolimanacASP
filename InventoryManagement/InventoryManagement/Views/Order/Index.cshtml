@@ -33,7 +33,10 @@
             <h1 class="h3 mb-1">Orders</h1>
             <p class="text-muted small mb-0">Overview of order management and fulfillment — review statuses, revenue and recent activity.</p>
         </div>
-        <div class="text-end">
+        <div class="text-end d-flex gap-2">
+            <a href="/orders/create" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle"></i> Create Order
+            </a>
             <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
         </div>
     </div>
@@ -131,6 +134,28 @@
     else
     {
         <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-8">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-0">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="orderSearchInput" class="form-control border-start-0" placeholder="Search by order number, customer name, email, or status..." />
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button type="button" id="clearOrderSearch" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-x-circle"></i> Clear
+                        </button>
+                        <span id="orderSearchLoading" class="ms-2" style="display: none;">
+                            <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+                            <small class="text-muted ms-1">Searching...</small>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -139,43 +164,14 @@
                                 <th scope="col">Order #</th>
                                 <th scope="col">Customer</th>
                                 <th scope="col">Order Date</th>
-                                <th scope="col">Items</th>
                                 <th scope="col">Total</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">Delivery</th>
-                                <th scope="col">Note</th>
+                                <th scope="col">Items</th>
                                 <th scope="col" class="text-end">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach (var order in orders)
-                            {
-                                var userName = (order?.User != null) ? $"{order.User.FirstName} {order.User.LastName}" : "Unknown";
-                                var itemsCount = order?.OrderItems?.Count ?? 0;
-                                var deliveryText = order?.DeliveryDate.HasValue == true ? order.DeliveryDate.Value.ToString("d", culture) : "Pending";
-                                string badgeClass = order?.Status switch
-{
-    OrderStatus.Delivered => "badge bg-success",
-    OrderStatus.Processing => "badge bg-info text-white",
-    OrderStatus.Pending => "badge bg-warning text-dark",
-    OrderStatus.Cancelled => "badge bg-danger",
-    _ => "badge bg-secondary"
-};
-
-                                <tr>
-                                    <td class="fw-semibold">@Html.DisplayFor(m => order.OrderNumber)</td>
-                                    <td>@userName</td>
-                                    <td>@(order?.OrderDate.ToString("g", culture) ?? "-")</td>
-                                    <td>@itemsCount</td>
-                                    <td>@(order != null ? order.TotalPrice.ToString("C", culture) : "-")</td>
-                                    <td><span class="@badgeClass">@order?.Status.ToString()</span></td>
-                                    <td>@deliveryText</td>
-                                    <td class="text-truncate" style="max-width:220px;">@(!string.IsNullOrWhiteSpace(order?.Note) ? order.Note : "—")</td>
-                                    <td class="text-end">
-                                        <a asp-controller="Order" asp-action="Details" asp-route-id="@order?.Id" class="btn btn-sm btn-outline-primary">Details</a>
-                                    </td>
-                                </tr>
-                            }
+                        <tbody id="orderTableBody">
+                            @await Html.PartialAsync("_OrderTableRows", orders)
                         </tbody>
                     </table>
                 </div>
@@ -191,3 +187,66 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            let searchTimeout;
+
+            // Handle order search input
+            $('#orderSearchInput').on('input', function() {
+                clearTimeout(searchTimeout);
+                const term = $(this).val().trim();
+
+                // Show loading indicator
+                $('#orderSearchLoading').show();
+
+                // Debounce search requests (300ms)
+                searchTimeout = setTimeout(function() {
+                    $.ajax({
+                        url: '/orders/search',
+                        data: { term: term },
+                        method: 'GET',
+                        timeout: 5000,
+                        success: function(html) {
+                            // Fade out and replace content
+                            $('#orderTableBody').fadeOut(150, function() {
+                                $(this).html(html).fadeIn(150);
+                            });
+                        },
+                        error: function() {
+                            $('#orderTableBody').html('<tr><td colspan="7" class="text-center text-danger py-4">Error loading results. Please try again.</td></tr>');
+                        },
+                        complete: function() {
+                            // Hide loading indicator
+                            $('#orderSearchLoading').hide();
+                        }
+                    });
+                }, 300);
+            });
+
+            // Handle clear button
+            $('#clearOrderSearch').on('click', function() {
+                $('#orderSearchInput').val('').focus();
+                clearTimeout(searchTimeout);
+                $('#orderSearchLoading').show();
+
+                // Reload all orders
+                $.ajax({
+                    url: '/orders/search',
+                    data: { term: '' },
+                    method: 'GET',
+                    timeout: 5000,
+                    success: function(html) {
+                        $('#orderTableBody').fadeOut(150, function() {
+                            $(this).html(html).fadeIn(150);
+                        });
+                    },
+                    complete: function() {
+                        $('#orderSearchLoading').hide();
+                    }
+                });
+            });
+        });
+    </script>
+}

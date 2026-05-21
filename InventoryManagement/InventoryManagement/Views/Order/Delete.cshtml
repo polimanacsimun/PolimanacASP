@@ -1,0 +1,101 @@
+@model InventoryManagement.Domain.Models.Order
+
+@{
+    ViewData["Title"] = "Delete Order";
+}
+
+<div class="container my-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a href="/orders/history">Orders</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Delete Order</li>
+        </ol>
+    </nav>
+
+    <!-- Page header -->
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Delete Order</h1>
+        <p class="text-muted mb-0">Confirm order deletion.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <!-- Warning Alert -->
+            @if (!((bool?)ViewBag.CanDelete ?? true))
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Cannot Delete:</strong> This order contains one or more order items and cannot be deleted.
+                    Please remove all items from this order before attempting to delete it.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Warning:</strong> This action is permanent and cannot be undone. Deleting this order will remove all associated records.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Order Details Card -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-light border-bottom">
+                    <strong>Order Details</strong>
+                </div>
+
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Order ID</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
+
+                        <dt class="col-sm-4 text-muted">Order Number</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model.OrderNumber</dd>
+
+                        <dt class="col-sm-4 text-muted">Order Date</dt>
+                        <dd class="col-sm-8">@Model.OrderDate.ToString("dd MMM yyyy")</dd>
+
+                        <dt class="col-sm-4 text-muted">Total Price</dt>
+                        <dd class="col-sm-8">@Model.TotalPrice.ToString("C")</dd>
+
+                        <dt class="col-sm-4 text-muted">Status</dt>
+                        <dd class="col-sm-8">@Model.Status</dd>
+
+                        <dt class="col-sm-4 text-muted">Delivery Date</dt>
+                        <dd class="col-sm-8">@(Model.DeliveryDate.HasValue ? Model.DeliveryDate.Value.ToString("dd MMM yyyy") : "—")</dd>
+
+                        <dt class="col-sm-4 text-muted">User</dt>
+                        <dd class="col-sm-8">@(Model.User != null ? $"{Model.User.FirstName} {Model.User.LastName}" : "—")</dd>
+
+                        <dt class="col-sm-4 text-muted">Note</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Note) ? "—" : Model.Note)</dd>
+
+                        <dt class="col-sm-4 text-muted">Order Items</dt>
+                        <dd class="col-sm-8">@(Model.OrderItems?.Count ?? 0)</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex gap-2">
+                @if ((bool?)ViewBag.CanDelete ?? true)
+                {
+                    <form method="post" action="/orders/@Model.Id/delete" class="me-2">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Delete Order
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger disabled" disabled>
+                        <i class="bi bi-trash"></i> Delete Order
+                    </button>
+                }
+                <a href="/orders/@Model.Id/summary" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>

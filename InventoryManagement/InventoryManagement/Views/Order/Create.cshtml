@@ -1,0 +1,125 @@
+@using InventoryManagement.Domain.Enums
+@model InventoryManagement.ViewModels.Order.OrderFormModel
+
+@{
+    ViewData["Title"] = "Create Order";
+}
+
+<div class="container my-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a href="/orders/history">Orders</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create Order</li>
+        </ol>
+    </nav>
+
+    <!-- Page header -->
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Create New Order</h1>
+        <p class="text-muted mb-0">Add a new order to your inventory management system.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light border-bottom">
+                    <strong>Order Details</strong>
+                </div>
+
+                <div class="card-body">
+                    <form asp-action="Create" method="post" novalidate>
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="All" class="alert alert-danger alert-dismissible fade show" role="alert" style="display:none;">
+                            <strong>Please correct the following errors:</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div asp-validation-summary="All" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>Please correct the following errors:</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
+                        <!-- Order Number -->
+                        <div class="mb-3">
+                            <label asp-for="OrderNumber" class="form-label">Order Number</label>
+                            <input asp-for="OrderNumber" class="form-control" placeholder="e.g., ORD-2026-001" />
+                            <span asp-validation-for="OrderNumber" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Order Date -->
+                        <div class="mb-3">
+                            <label asp-for="OrderDate" class="form-label">Order Date</label>
+                            <input asp-for="OrderDate" type="date" class="form-control" />
+                            <span asp-validation-for="OrderDate" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Total Price -->
+                        <div class="mb-3">
+                            <label asp-for="TotalPrice" class="form-label">Total Price</label>
+                            <input asp-for="TotalPrice" type="number" step="0.01" class="form-control" placeholder="e.g., 1500.00" />
+                            <span asp-validation-for="TotalPrice" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label">Status</label>
+                            <select asp-for="Status" asp-items="Html.GetEnumSelectList<OrderStatus>()" class="form-select"></select>
+                            <span asp-validation-for="Status" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Delivery Date -->
+                        <div class="mb-3">
+                            <label asp-for="DeliveryDate" class="form-label">Delivery Date (Optional)</label>
+                            <input asp-for="DeliveryDate" type="date" class="form-control" />
+                            <span asp-validation-for="DeliveryDate" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Note -->
+                        <div class="mb-3">
+                            <label asp-for="Note" class="form-label">Note</label>
+                            <textarea asp-for="Note" class="form-control" rows="3" placeholder="Additional order notes..."></textarea>
+                            <span asp-validation-for="Note" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- User Autocomplete -->
+                        @{
+                            var userAutocomplete = new InventoryManagement.ViewModels.Shared.AutocompleteDropdownModel
+                            {
+                                Label = "User",
+                                HiddenInputName = "UserId",
+                                HiddenInputId = "UserId",
+                                DisplayInputId = "UserDisplay",
+                                SearchUrl = "/lookup/users",
+                                SelectedId = Model.UserId,
+                                DisplayValue = Model.UserDisplayName,
+                                Placeholder = "Search user...",
+                                HelpText = "Start typing to search users."
+                            };
+                        }
+                        @await Html.PartialAsync("_AutocompleteDropdown", userAutocomplete)
+
+                        <!-- Anti-forgery token -->
+                        @Html.AntiForgeryToken()
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Create Order
+                            </button>
+                            <a href="/orders/history" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
