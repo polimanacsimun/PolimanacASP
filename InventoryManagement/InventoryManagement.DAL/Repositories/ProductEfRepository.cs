@@ -81,5 +81,27 @@ namespace InventoryManagement.DAL.Repositories
 
             return !product.OrderItems.Any() && !product.InventoryItems.Any();
         }
+
+        public List<Product> Search(string? term, int maxResults = 50)
+        {
+            IQueryable<Product> query = _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Supplier)
+                .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                query = query.Where(p =>
+                    p.Name.Contains(term) ||
+                    (p.Description != null && p.Description.Contains(term)) ||
+                    (p.Category != null && p.Category.Name.Contains(term)) ||
+                    (p.Supplier != null && p.Supplier.Name.Contains(term)));
+            }
+
+            return query
+                .OrderBy(p => p.Name)
+                .Take(maxResults)
+                .ToList();
+        }
     }
 }

@@ -1,0 +1,54 @@
+@using System
+@using System.Linq
+@model IEnumerable<InventoryManagement.Domain.Models.Product>
+
+@{
+    var products = Model?.ToList() ?? new List<InventoryManagement.Domain.Models.Product>();
+}
+
+@if (!products.Any())
+{
+    <tr>
+        <td colspan="8" class="text-center text-muted py-4">No products found.</td>
+    </tr>
+}
+else
+{
+    @foreach (var item in products)
+    {
+        <tr>
+            <td class="ps-4">
+                <div class="fw-semibold">@item.Name</div>
+                <div class="text-muted small">@item.Category?.Name ?? "—"</div>
+            </td>
+            <td>@(item.Price.ToString("C"))</td>
+            <td><span class="badge bg-secondary">@item.Type</span></td>
+            <td>@(item.Category?.Name ?? "-")</td>
+            <td>@(item.Supplier?.Name ?? "-")</td>
+            <td class="text-end">@item.MinimumStock</td>
+            <td>
+                @if (item.IsActive)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm" role="group">
+                    <a href="/catalog/@item.Id" class="btn btn-outline-primary" title="View Details">
+                        Details
+                    </a>
+                    <a href="/catalog/@item.Id/edit" class="btn btn-outline-info" title="Edit Product">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="/catalog/@item.Id/delete" class="btn btn-outline-danger" title="Delete Product">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    }
+}

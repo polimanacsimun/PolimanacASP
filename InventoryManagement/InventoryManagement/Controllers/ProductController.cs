@@ -170,5 +170,13 @@ public ProductController(ProductEfRepository repository)
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        [Route("catalog/search")]
+        public IActionResult Search(string? term)
+        {
+            var products = _repository.Search(term);
+            return PartialView("_ProductTableRows", products);
+        }
     }
 }

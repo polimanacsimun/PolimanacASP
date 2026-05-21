@@ -42,6 +42,50 @@ namespace InventoryManagement.DAL.Repositories
 
             return query.OrderBy(c => c.Name).Take(maxResults).ToList();
         }
+
+        public void Add(Category category)
+        {
+            _context.Categories.Add(category);
+            _context.SaveChanges();
+        }
+
+        public void Update(Category category)
+        {
+            _context.Categories.Update(category);
+            _context.SaveChanges();
+        }
+
+        public bool Delete(int id)
+        {
+            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+
+            if (category == null)
+                return false;
+
+            if (!CanDelete(id))
+                return false;
+
+            _context.Categories.Remove(category);
+            _context.SaveChanges();
+            return true;
+        }
+
+        public bool Exists(int id)
+        {
+            return _context.Categories.Any(c => c.Id == id);
+        }
+
+        public bool CanDelete(int id)
+        {
+            var category = _context.Categories
+                .Include(c => c.Products)
+                .FirstOrDefault(c => c.Id == id);
+
+            if (category == null)
+                return false;
+
+            return !category.Products.Any();
+        }
         
     }
 }

@@ -101,6 +101,29 @@
             <div class="text-muted small">Records: @total</div>
         </div>
 
+        <!-- Search UI -->
+        <div class="card-body border-bottom pb-3">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="productSearchInput" class="form-control border-start-0" placeholder="Search by product name, description, category, or supplier..." />
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button type="button" id="clearProductSearch" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </button>
+                    <span id="productSearchLoading" class="ms-2" style="display: none;">
+                        <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+                        <small class="text-muted ms-1">Searching...</small>
+                    </span>
+                </div>
+            </div>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
@@ -115,55 +138,73 @@
                         <th class="text-end pe-4">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @if (!products.Any())
-                    {
-                        <tr>
-                            <td colspan="8" class="text-center text-muted py-4">No products found.</td>
-                        </tr>
-                    }
-                    else
-                    {
-                        @foreach (var item in products)
-                        {
-                            <tr>
-                                <td class="ps-4">
-                                    <div class="fw-semibold">@item.Name</div>
-                                    <div class="text-muted small">@item.Category?.Name ?? "—"</div>
-                                </td>
-                                <td>@(item.Price.ToString("C"))</td>
-                                <td><span class="badge bg-secondary">@item.Type</span></td>
-                                <td>@(item.Category?.Name ?? "-")</td>
-                                <td>@(item.Supplier?.Name ?? "-")</td>
-                                <td class="text-end">@item.MinimumStock</td>
-                                <td>
-                                    @if (item.IsActive)
-                                    {
-                                        <span class="badge bg-success">Active</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">Inactive</span>
-                                    }
-                                </td>
-                                <td class="text-end pe-4">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a asp-controller="Product" asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary" title="View Details">
-                                            Details
-                                        </a>
-                                        <a href="/catalog/@item.Id/edit" class="btn btn-outline-info" title="Edit Product">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <a href="/catalog/@item.Id/delete" class="btn btn-outline-danger" title="Delete Product">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
+                <tbody id="productTableBody">
+                    @await Html.PartialAsync("_ProductTableRows", products)
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            let searchTimeout;
+
+            // Handle product search input
+            $('#productSearchInput').on('input', function() {
+                clearTimeout(searchTimeout);
+                const term = $(this).val().trim();
+
+                // Show loading indicator
+                $('#productSearchLoading').show();
+
+                // Debounce search requests (300ms)
+                searchTimeout = setTimeout(function() {
+                    $.ajax({
+                        url: '/catalog/search',
+                        data: { term: term },
+                        method: 'GET',
+                        timeout: 5000,
+                        success: function(html) {
+                            // Fade out and replace content
+                            $('#productTableBody').fadeOut(150, function() {
+                                $(this).html(html).fadeIn(150);
+                            });
+                        },
+                        error: function() {
+                            $('#productTableBody').html('<tr><td colspan="8" class="text-center text-danger py-4">Error loading results. Please try again.</td></tr>');
+                        },
+                        complete: function() {
+                            // Hide loading indicator
+                            $('#productSearchLoading').hide();
+                        }
+                    });
+                }, 300);
+            });
+
+            // Handle clear button
+            $('#clearProductSearch').on('click', function() {
+                $('#productSearchInput').val('').focus();
+                clearTimeout(searchTimeout);
+                $('#productSearchLoading').show();
+
+                // Reload all products
+                $.ajax({
+                    url: '/catalog/search',
+                    data: { term: '' },
+                    method: 'GET',
+                    timeout: 5000,
+                    success: function(html) {
+                        $('#productTableBody').fadeOut(150, function() {
+                            $(this).html(html).fadeIn(150);
+                        });
+                    },
+                    complete: function() {
+                        $('#productSearchLoading').hide();
+                    }
+                });
+            });
+        });
+    </script>
+}

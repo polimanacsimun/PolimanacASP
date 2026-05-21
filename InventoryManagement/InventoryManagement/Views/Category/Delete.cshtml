@@ -1,0 +1,79 @@
+@using InventoryManagement.Domain.Models
+@model Category
+
+@{
+    ViewData["Title"] = "Delete Category";
+    bool canDelete = (bool?)ViewBag.CanDelete ?? false;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Delete Category
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Delete Confirmation Alert -->
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <strong>Warning:</strong> This action cannot be undone. Please review the category details below before confirming deletion.
+                    </div>
+
+                    <!-- Category Details -->
+                    <div class="mb-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">Category ID</label>
+                            <p class="fs-5">@Model.Id</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">Category Name</label>
+                            <p class="fs-5">@Model.Name</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">Description</label>
+                            <p>@(string.IsNullOrEmpty(Model.Description) ? "N/A" : Model.Description)</p>
+                        </div>
+                    </div>
+
+                    <!-- Delete Restriction Warning -->
+                    @if (!canDelete)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-lock-fill"></i>
+                            <strong>Cannot Delete:</strong> This category is currently used by one or more products. Remove or reassign all products to this category before attempting deletion.
+                        </div>
+                    }
+
+                    <!-- Form Actions -->
+                    <div class="d-flex gap-2">
+                        @if (canDelete)
+                        {
+                            <form method="post" style="display: inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="bi bi-trash"></i> Delete Category
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-danger btn-lg disabled" disabled>
+                                <i class="bi bi-trash"></i> Delete Category
+                            </button>
+                        }
+
+                        <a href="/categories" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

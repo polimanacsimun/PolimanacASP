@@ -1,0 +1,51 @@
+@using System
+@using System.Linq
+@model IEnumerable<InventoryManagement.Domain.Models.Category>
+
+@{
+    var categories = Model?.ToList() ?? new List<InventoryManagement.Domain.Models.Category>();
+}
+
+@if (!categories.Any())
+{
+    <tr>
+        <td colspan="4" class="text-center text-muted py-4">No categories found.</td>
+    </tr>
+}
+else
+{
+    @foreach (var item in categories)
+    {
+        <tr>
+            <td class="ps-4">
+                <div class="fw-semibold">@item.Name</div>
+            </td>
+            <td>
+                @if (string.IsNullOrEmpty(item.Description))
+                {
+                    <span class="text-muted">—</span>
+                }
+                else
+                {
+                    <span>@item.Description.Substring(0, Math.Min(50, item.Description.Length))@(item.Description.Length > 50 ? "..." : "")</span>
+                }
+            </td>
+            <td class="text-end">
+                @(item.Products?.Count ?? 0)
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm" role="group">
+                    <a href="/categories/@item.Id" class="btn btn-outline-primary" title="View Details">
+                        Details
+                    </a>
+                    <a href="/categories/@item.Id/edit" class="btn btn-outline-info" title="Edit Category">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="/categories/@item.Id/delete" class="btn btn-outline-danger" title="Delete Category">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    }
+}
