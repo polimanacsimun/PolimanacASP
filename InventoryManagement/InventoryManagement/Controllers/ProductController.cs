@@ -71,6 +71,7 @@ public ProductController(ProductEfRepository repository)
             };
 
             _repository.Add(product);
+            TempData["ToastMessage"] = "Product created successfully.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -130,6 +131,7 @@ public ProductController(ProductEfRepository repository)
             product.SupplierId = model.SupplierId;
 
             _repository.Update(product);
+            TempData["ToastMessage"] = "Product updated successfully.";
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -168,6 +170,7 @@ public ProductController(ProductEfRepository repository)
                 return NotFound();
             }
 
+            TempData["ToastMessage"] = "Product deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
 
