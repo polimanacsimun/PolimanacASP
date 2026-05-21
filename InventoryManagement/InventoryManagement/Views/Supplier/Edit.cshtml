@@ -1,3 +1,4 @@
+@using InventoryManagement.ViewModels.Shared
 @using InventoryManagement.ViewModels.Supplier
 @model SupplierFormModel
 
@@ -65,14 +66,17 @@
                         </div>
 
                         <!-- Registration Date & Active Status -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="RegistrationDate" class="form-label fw-semibold">Registration Date</label>
-                                    <input asp-for="RegistrationDate" type="date" class="form-control" />
-                                    <span asp-validation-for="RegistrationDate" class="invalid-feedback d-block"></span>
-                                </div>
-                            </div>
+                        @await Html.PartialAsync("_DateTimeInput", new DateTimeInputModel
+                        {
+                            Label = "Registration Date",
+                            InputName = "RegistrationDate",
+                            InputId = "RegistrationDate",
+                            Value = Model.RegistrationDate,
+                            Placeholder = "Enter registration date",
+                            HelpText = "Use your browser language format.",
+                            IncludeTime = false,
+                            IsRequired = true
+                        })
 
                             <div class="col-md-6">
                                 <div class="mb-3 pt-3">
@@ -84,7 +88,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
                         <!-- Form Actions -->
                         <div class="d-flex gap-2">

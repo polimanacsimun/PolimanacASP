@@ -1,4 +1,5 @@
 @using InventoryManagement.Domain.Enums
+@using InventoryManagement.ViewModels.Shared
 @model InventoryManagement.ViewModels.Order.OrderFormModel
 
 @{
@@ -50,11 +51,17 @@
                         </div>
 
                         <!-- Order Date -->
-                        <div class="mb-3">
-                            <label asp-for="OrderDate" class="form-label">Order Date</label>
-                            <input asp-for="OrderDate" type="date" class="form-control" />
-                            <span asp-validation-for="OrderDate" class="invalid-feedback d-block"></span>
-                        </div>
+                        @await Html.PartialAsync("_DateTimeInput", new DateTimeInputModel
+                        {
+                            Label = "Order Date",
+                            InputName = "OrderDate",
+                            InputId = "OrderDate",
+                            Value = Model.OrderDate,
+                            Placeholder = "Enter order date",
+                            HelpText = "Use your browser language format. Time is included for order tracking.",
+                            IncludeTime = true,
+                            IsRequired = true
+                        })
 
                         <!-- Total Price -->
                         <div class="mb-3">
@@ -71,11 +78,17 @@
                         </div>
 
                         <!-- Delivery Date -->
-                        <div class="mb-3">
-                            <label asp-for="DeliveryDate" class="form-label">Delivery Date (Optional)</label>
-                            <input asp-for="DeliveryDate" type="date" class="form-control" />
-                            <span asp-validation-for="DeliveryDate" class="invalid-feedback d-block"></span>
-                        </div>
+                        @await Html.PartialAsync("_DateTimeInput", new DateTimeInputModel
+                        {
+                            Label = "Delivery Date",
+                            InputName = "DeliveryDate",
+                            InputId = "DeliveryDate",
+                            Value = Model.DeliveryDate,
+                            Placeholder = "Enter delivery date",
+                            HelpText = "Optional delivery date.",
+                            IncludeTime = false,
+                            IsRequired = false
+                        })
 
                         <!-- Note -->
                         <div class="mb-3">

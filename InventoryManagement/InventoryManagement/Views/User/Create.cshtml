@@ -1,4 +1,5 @@
 @using InventoryManagement.Domain.Enums
+@using InventoryManagement.ViewModels.Shared
 @model InventoryManagement.ViewModels.User.UserFormModel
 
 @{
@@ -73,11 +74,17 @@
                         </div>
 
                         <!-- Registration Date -->
-                        <div class="mb-3">
-                            <label asp-for="RegistrationDate" class="form-label">Registration Date</label>
-                            <input asp-for="RegistrationDate" type="date" class="form-control" />
-                            <span asp-validation-for="RegistrationDate" class="invalid-feedback d-block"></span>
-                        </div>
+                        @await Html.PartialAsync("_DateTimeInput", new DateTimeInputModel
+                        {
+                            Label = "Registration Date",
+                            InputName = "RegistrationDate",
+                            InputId = "RegistrationDate",
+                            Value = Model.RegistrationDate,
+                            Placeholder = "Enter registration date",
+                            HelpText = "Use your browser language format.",
+                            IncludeTime = false,
+                            IsRequired = true
+                        })
 
                         <!-- IsActive -->
                         <div class="mb-4">
