@@ -115,12 +115,17 @@
                             </div>
                         </div>
 
-                        <!-- Created At -->
-                        <div class="mb-3">
-                            <label asp-for="CreatedAt" class="form-label fw-semibold">Creation Date</label>
-                            <input asp-for="CreatedAt" type="date" class="form-control" />
-                            <span asp-validation-for="CreatedAt" class="invalid-feedback d-block"></span>
-                        </div>
+                        @await Html.PartialAsync("_DateTimeInput", new DateTimeInputModel
+                        {
+                            Label = "Creation Date",
+                            InputName = "CreatedAt",
+                            InputId = "CreatedAt",
+                            Value = Model.CreatedAt,
+                            Placeholder = "Enter creation date",
+                            HelpText = "Use your browser language format.",
+                            IncludeTime = false,
+                            IsRequired = true
+                        })
 
                         <!-- Is Active -->
                         <div class="mb-4">

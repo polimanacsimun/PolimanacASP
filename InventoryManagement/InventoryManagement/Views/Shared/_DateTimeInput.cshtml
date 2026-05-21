@@ -1,0 +1,67 @@
+@using InventoryManagement.ViewModels.Shared
+@model DateTimeInputModel
+
+@{
+    // Format the DateTime value for the hidden input
+    string formattedValue = string.Empty;
+    if (Model?.Value.HasValue == true)
+    {
+        formattedValue = Model.IncludeTime 
+            ? Model.Value.Value.ToString("yyyy-MM-ddTHH:mm")
+            : Model.Value.Value.ToString("yyyy-MM-dd");
+    }
+
+    // Format the DateTime value for display in the visible input
+    string displayValue = string.Empty;
+    if (Model?.Value.HasValue == true)
+    {
+        displayValue = Model.IncludeTime
+            ? Model.Value.Value.ToString("dd MMM yyyy HH:mm")
+            : Model.Value.Value.ToString("dd MMM yyyy");
+    }
+}
+
+<div class="mb-3">
+    <!-- Label -->
+    @if (!string.IsNullOrWhiteSpace(Model?.Label))
+    {
+        <label for="@Model.InputId" class="form-label">
+            @Model.Label
+            @if (Model?.IsRequired == true)
+            {
+                <span class="text-danger">*</span>
+            }
+        </label>
+    }
+
+    <!-- Visible Text Input (for user interaction) -->
+    <input 
+        type="text"
+        class="form-control custom-date-display"
+        id="@(Model?.InputId)_display"
+        placeholder="@(Model?.Placeholder ?? (Model?.IncludeTime == true ? "DD MMM YYYY HH:MM" : "DD MMM YYYY"))"
+        autocomplete="off"
+        data-date-input="true"
+        data-hidden-input-id="@Model?.InputId"
+        data-include-time="@(Model?.IncludeTime.ToString().ToLower() ?? "false")"
+        value="@displayValue"
+        @(Model?.IsRequired == true ? "required" : "") />
+
+    <!-- Hidden Input (for model binding) -->
+    <input
+        type="hidden"
+        name="@Model?.InputName"
+        id="@Model?.InputId"
+        value="@formattedValue" />
+
+    <!-- Validation Message -->
+    <span class="invalid-feedback d-block"
+          data-valmsg-for="@Model?.InputName"
+          data-valmsg-replace="true"></span>
+
+    <!-- Help Text -->
+    @if (!string.IsNullOrWhiteSpace(Model?.HelpText))
+    {
+        <small class="form-text text-muted d-block mt-1">@Model.HelpText</small>
+    }
+</div>
