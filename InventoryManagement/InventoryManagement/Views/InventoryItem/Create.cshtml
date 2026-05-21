@@ -1,0 +1,142 @@
+@using InventoryManagement.ViewModels.InventoryItem
+@using InventoryManagement.ViewModels.Shared
+@model InventoryItemFormModel
+
+@{
+    ViewData["Title"] = "Create Inventory Record";
+}
+
+<div class="container my-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a href="/inventory">Inventory Records</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create Record</li>
+        </ol>
+    </nav>
+
+    <!-- Page header -->
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Create Inventory Record</h1>
+        <p class="text-muted mb-0">Add a new inventory record for a product in a warehouse.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light border-bottom">
+                    <strong>Inventory Details</strong>
+                </div>
+
+                <div class="card-body">
+                    <form asp-action="Create" method="post" novalidate>
+                        <!-- Validation Summary -->
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div asp-validation-summary="All" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>Please correct the following errors:</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
+                        <!-- Product Autocomplete -->
+                        @{
+                            var productAutocomplete = new AutocompleteDropdownModel
+                            {
+                                Label = "Product",
+                                HiddenInputName = "ProductId",
+                                HiddenInputId = "ProductId",
+                                DisplayInputId = "ProductDisplay",
+                                SearchUrl = "/lookup/products",
+                                SelectedId = Model.ProductId,
+                                DisplayValue = Model.ProductDisplayName,
+                                Placeholder = "Search product...",
+                                HelpText = "Start typing to search products."
+                            };
+                        }
+                        @await Html.PartialAsync("_AutocompleteDropdown", productAutocomplete)
+
+                        <!-- Warehouse Autocomplete -->
+                        @{
+                            var warehouseAutocomplete = new AutocompleteDropdownModel
+                            {
+                                Label = "Warehouse",
+                                HiddenInputName = "WarehouseId",
+                                HiddenInputId = "WarehouseId",
+                                DisplayInputId = "WarehouseDisplay",
+                                SearchUrl = "/lookup/warehouses",
+                                SelectedId = Model.WarehouseId,
+                                DisplayValue = Model.WarehouseDisplayName,
+                                Placeholder = "Search warehouse...",
+                                HelpText = "Start typing to search warehouses."
+                            };
+                        }
+                        @await Html.PartialAsync("_AutocompleteDropdown", warehouseAutocomplete)
+
+                        <!-- Quantity In Stock -->
+                        <div class="mb-3">
+                            <label asp-for="QuantityInStock" class="form-label">Current Quantity</label>
+                            <input asp-for="QuantityInStock" type="number" class="form-control" placeholder="0" />
+                            <span asp-validation-for="QuantityInStock" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Minimum Quantity -->
+                        <div class="mb-3">
+                            <label asp-for="MinimumQuantity" class="form-label">Minimum Quantity</label>
+                            <input asp-for="MinimumQuantity" type="number" class="form-control" placeholder="0" />
+                            <span asp-validation-for="MinimumQuantity" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Maximum Quantity -->
+                        <div class="mb-3">
+                            <label asp-for="MaximumQuantity" class="form-label">Maximum Quantity</label>
+                            <input asp-for="MaximumQuantity" type="number" class="form-control" placeholder="0" />
+                            <span asp-validation-for="MaximumQuantity" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Shelf Location -->
+                        <div class="mb-3">
+                            <label asp-for="ShelfLocation" class="form-label">Shelf Location (Optional)</label>
+                            <input asp-for="ShelfLocation" class="form-control" placeholder="e.g., A-12-3" />
+                            <span asp-validation-for="ShelfLocation" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Last Checked At (Custom Date/Time Input) -->
+                        @{
+                            var dateTimeInput = new DateTimeInputModel
+                            {
+                                Label = "Last Checked At",
+                                InputName = "LastCheckedAt",
+                                InputId = "LastCheckedAt",
+                                Value = Model.LastCheckedAt,
+                                IncludeTime = true,
+                                IsRequired = true,
+                                Placeholder = "Select date and time",
+                                HelpText = "Date and time when this inventory was last audited."
+                            };
+                        }
+                        @await Html.PartialAsync("_DateTimeInput", dateTimeInput)
+
+                        <!-- Anti-forgery token -->
+                        @Html.AntiForgeryToken()
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Create Record
+                            </button>
+                            <a href="/inventory" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="~/js/autocomplete-dropdown.js"></script>
+    <script src="~/js/custom-date-input.js"></script>
+}

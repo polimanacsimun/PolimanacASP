@@ -1,0 +1,99 @@
+@using System.Globalization
+@model InventoryManagement.Domain.Models.InventoryItem
+
+@{
+    ViewData["Title"] = "Delete Inventory Record";
+    var culture = CultureInfo.CurrentCulture;
+}
+
+<div class="container my-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a href="/inventory">Inventory Records</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Delete Record</li>
+        </ol>
+    </nav>
+
+    <!-- Page header -->
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Delete Inventory Record</h1>
+        <p class="text-muted mb-0">Confirm deletion of this inventory record.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <!-- Warning Alert -->
+            @if (!((bool?)ViewBag.CanDelete ?? true))
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Cannot Delete:</strong> This inventory record cannot be deleted due to dependencies or system constraints.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Warning:</strong> This action is permanent and cannot be undone. Deleting this inventory record will remove all associated data.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Inventory Details Card -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-light border-bottom">
+                    <strong>Inventory Details</strong>
+                </div>
+
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Product</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model?.Product?.Name</dd>
+
+                        <dt class="col-sm-4 text-muted">Warehouse</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model?.Warehouse?.Name</dd>
+
+                        <dt class="col-sm-4 text-muted">Current Stock</dt>
+                        <dd class="col-sm-8">@Model?.QuantityInStock</dd>
+
+                        <dt class="col-sm-4 text-muted">Minimum Level</dt>
+                        <dd class="col-sm-8">@Model?.MinimumQuantity</dd>
+
+                        <dt class="col-sm-4 text-muted">Maximum Level</dt>
+                        <dd class="col-sm-8">@Model?.MaximumQuantity</dd>
+
+                        <dt class="col-sm-4 text-muted">Shelf Location</dt>
+                        <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model?.ShelfLocation) ? Model.ShelfLocation : "—")</dd>
+
+                        <dt class="col-sm-4 text-muted">Last Checked</dt>
+                        <dd class="col-sm-8">@Model?.LastCheckedAt.ToString("dd MMM yyyy HH:mm", culture)</dd>
+
+                        <dt class="col-sm-4 text-muted">Record ID</dt>
+                        <dd class="col-sm-8">@Model?.Id</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex gap-2">
+                @if ((bool?)ViewBag.CanDelete ?? true)
+                {
+                    <form method="post" action="/inventory/@Model?.Id/delete" class="me-2">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Delete Record
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger disabled" disabled>
+                        <i class="bi bi-trash"></i> Delete Record
+                    </button>
+                }
+                <a href="/inventory/@Model?.Id" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
