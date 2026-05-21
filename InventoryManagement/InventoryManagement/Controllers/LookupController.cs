@@ -12,14 +12,16 @@ namespace InventoryManagement.Controllers
         private readonly UserEfRepository _userRepository;
         private readonly ProductEfRepository _productRepository;
         private readonly WarehouseEfRepository _warehouseRepository;
+        private readonly OrderEfRepository _orderRepository;
 
-        public LookupController(CategoryEfRepository categoryRepository, SupplierEfRepository supplierRepository, UserEfRepository userRepository, ProductEfRepository productRepository, WarehouseEfRepository warehouseRepository)
+        public LookupController(CategoryEfRepository categoryRepository, SupplierEfRepository supplierRepository, UserEfRepository userRepository, ProductEfRepository productRepository, WarehouseEfRepository warehouseRepository, OrderEfRepository orderRepository)
         {
             _categoryRepository = categoryRepository;
             _supplierRepository = supplierRepository;
             _userRepository = userRepository;
             _productRepository = productRepository;
             _warehouseRepository = warehouseRepository;
+            _orderRepository = orderRepository;
         }
 
         /// <summary>
@@ -80,6 +82,19 @@ namespace InventoryManagement.Controllers
         {
             var warehouses = _warehouseRepository.Search(term, 10);
             var result = warehouses.Select(w => new { id = w.Id, text = w.Name }).ToList();
+            return Json(result);
+        }
+
+        /// <summary>
+        /// AJAX endpoint for order autocomplete search.
+        /// Returns JSON array with id and text properties for use with jQuery Autocomplete or similar controls.
+        /// Text format: Order number (e.g., "ORD-2026-001")
+        /// </summary>
+        [HttpGet("orders")]
+        public JsonResult GetOrders(string? term)
+        {
+            var orders = _orderRepository.Search(term, 10);
+            var result = orders.Select(o => new { id = o.Id, text = o.OrderNumber }).ToList();
             return Json(result);
         }
     }

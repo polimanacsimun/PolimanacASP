@@ -18,6 +18,7 @@ builder.Services.AddScoped<WarehouseEfRepository>();
 builder.Services.AddScoped<UserEfRepository>();
 builder.Services.AddScoped<OrderEfRepository>();
 builder.Services.AddScoped<InventoryItemEfRepository>();
+builder.Services.AddScoped<OrderItemEfRepository>();
 
 var app = builder.Build();
 

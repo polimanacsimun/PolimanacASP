@@ -1,0 +1,42 @@
+@using System
+@using System.Linq
+@model IEnumerable<InventoryManagement.Domain.Models.OrderItem>
+
+@{
+    var items = Model?.ToList() ?? new List<InventoryManagement.Domain.Models.OrderItem>();
+}
+
+@if (!items.Any())
+{
+    <tr>
+        <td colspan="8" class="text-center text-muted py-4">No order items found.</td>
+    </tr>
+}
+else
+{
+    @foreach (var item in items)
+    {
+        <tr>
+            <td class="fw-semibold">@item.Order?.OrderNumber</td>
+            <td>@item.Product?.Name</td>
+            <td class="text-center">@item.Quantity</td>
+            <td class="text-end">@item.UnitPrice.ToString("C")</td>
+            <td class="text-end">@item.Discount.ToString("C")</td>
+            <td class="text-end fw-semibold">@item.TotalPrice.ToString("C")</td>
+            <td>@item.CreatedAt.ToString("dd MMM yyyy HH:mm")</td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm" role="group">
+                    <a href="/order-items/@item.Id" class="btn btn-outline-primary" title="View Details">
+                        Details
+                    </a>
+                    <a href="/order-items/@item.Id/edit" class="btn btn-outline-info" title="Edit Item">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="/order-items/@item.Id/delete" class="btn btn-outline-danger" title="Delete Item">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    }
+}
