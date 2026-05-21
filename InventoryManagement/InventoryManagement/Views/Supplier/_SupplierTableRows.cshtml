@@ -1,0 +1,52 @@
+@using System
+@using System.Linq
+@model IEnumerable<InventoryManagement.Domain.Models.Supplier>
+
+@{
+    var suppliers = Model?.ToList() ?? new List<InventoryManagement.Domain.Models.Supplier>();
+}
+
+@if (!suppliers.Any())
+{
+    <tr>
+        <td colspan="6" class="text-center text-muted py-4">No suppliers found.</td>
+    </tr>
+}
+else
+{
+    @foreach (var item in suppliers)
+    {
+        <tr>
+            <td class="ps-4">
+                <div class="fw-semibold">@item.Name</div>
+                <div class="text-muted small">@item.Email</div>
+            </td>
+            <td>@(string.IsNullOrEmpty(item.Address) ? "—" : item.Address)</td>
+            <td>@(string.IsNullOrEmpty(item.Phone) ? "—" : item.Phone)</td>
+            <td>@(string.IsNullOrEmpty(item.ContactPerson) ? "—" : item.ContactPerson)</td>
+            <td>
+                @if (item.IsActive)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm" role="group">
+                    <a href="/vendors/@item.Id" class="btn btn-outline-primary" title="View Details">
+                        Details
+                    </a>
+                    <a href="/vendors/@item.Id/edit" class="btn btn-outline-info" title="Edit Supplier">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="/vendors/@item.Id/delete" class="btn btn-outline-danger" title="Delete Supplier">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    }
+}

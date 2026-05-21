@@ -1,0 +1,125 @@
+@using InventoryManagement.Domain.Models
+@model Supplier
+
+@{
+    ViewData["Title"] = "Delete Supplier";
+    bool canDelete = (bool?)ViewBag.CanDelete ?? false;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Delete Supplier
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Delete Confirmation Alert -->
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <strong>Warning:</strong> This action cannot be undone. Please review the supplier details below before confirming deletion.
+                    </div>
+
+                    <!-- Supplier Details -->
+                    <div class="mb-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">Supplier ID</label>
+                            <p class="fs-5">@Model.Id</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">Supplier Name</label>
+                            <p class="fs-5">@Model.Name</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">Email</label>
+                            <p class="fs-5">@Model.Email</p>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-muted">Address</label>
+                                    <p>@(string.IsNullOrEmpty(Model.Address) ? "N/A" : Model.Address)</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-muted">Phone</label>
+                                    <p>@(string.IsNullOrEmpty(Model.Phone) ? "N/A" : Model.Phone)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">Contact Person</label>
+                            <p>@(string.IsNullOrEmpty(Model.ContactPerson) ? "N/A" : Model.ContactPerson)</p>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-muted">Registration Date</label>
+                                    <p>@Model.RegistrationDate.ToString("d MMM yyyy")</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-muted">Status</label>
+                                    <p>
+                                        @if (Model.IsActive)
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Restriction Warning -->
+                    @if (!canDelete)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-lock-fill"></i>
+                            <strong>Cannot Delete:</strong> This supplier is currently used by one or more products. Remove or reassign all products to this supplier before attempting deletion.
+                        </div>
+                    }
+
+                    <!-- Form Actions -->
+                    <div class="d-flex gap-2">
+                        @if (canDelete)
+                        {
+                            <form method="post" style="display: inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="bi bi-trash"></i> Delete Supplier
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-danger btn-lg disabled" disabled>
+                                <i class="bi bi-trash"></i> Delete Supplier
+                            </button>
+                        }
+
+                        <a href="/vendors" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

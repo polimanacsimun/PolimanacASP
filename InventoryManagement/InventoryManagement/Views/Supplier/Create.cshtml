@@ -1,0 +1,106 @@
+@using InventoryManagement.ViewModels.Supplier
+@model SupplierFormModel
+
+@{
+    ViewData["Title"] = "Create Supplier";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> Create New Supplier
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <form method="post" class="needs-validation" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <!-- Supplier Name -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-semibold">Supplier Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter supplier business name" />
+                            <span asp-validation-for="Name" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-semibold">Email Address</label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="Enter email address" />
+                            <span asp-validation-for="Email" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Address & Phone -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Address" class="form-label fw-semibold">Address</label>
+                                    <input asp-for="Address" class="form-control" placeholder="Enter business address" />
+                                    <span asp-validation-for="Address" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Phone" class="form-label fw-semibold">Phone</label>
+                                    <input asp-for="Phone" class="form-control" placeholder="Enter phone number" />
+                                    <span asp-validation-for="Phone" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Person -->
+                        <div class="mb-3">
+                            <label asp-for="ContactPerson" class="form-label fw-semibold">Contact Person</label>
+                            <input asp-for="ContactPerson" class="form-control" placeholder="Enter primary contact person name" />
+                            <span asp-validation-for="ContactPerson" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Registration Date & Active Status -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="RegistrationDate" class="form-label fw-semibold">Registration Date</label>
+                                    <input asp-for="RegistrationDate" type="date" class="form-control" />
+                                    <span asp-validation-for="RegistrationDate" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3 pt-3">
+                                    <div class="form-check">
+                                        <input asp-for="IsActive" class="form-check-input" type="checkbox" id="IsActive" />
+                                        <label asp-for="IsActive" class="form-check-label fw-semibold">
+                                            Supplier is Active
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Create Supplier
+                            </button>
+                            <a href="/vendors" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

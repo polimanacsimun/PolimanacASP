@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using InventoryManagement.DAL.Repositories;
+using InventoryManagement.ViewModels.Supplier;
+using InventoryManagement.Domain.Models;
 
 namespace InventoryManagement.Controllers
 {
@@ -29,6 +31,145 @@ namespace InventoryManagement.Controllers
             }
 
             return View(supplier);
+        }
+
+        [Route("/vendors/create")]
+        [Route("Supplier/Create")]
+        public IActionResult Create()
+        {
+            var model = new SupplierFormModel();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/vendors/create")]
+        [Route("Supplier/Create")]
+        public IActionResult Create(SupplierFormModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var supplier = new Supplier
+            {
+                Name = model.Name,
+                Address = model.Address,
+                Phone = model.Phone,
+                Email = model.Email,
+                ContactPerson = model.ContactPerson,
+                RegistrationDate = model.RegistrationDate,
+                IsActive = model.IsActive
+            };
+
+            _repository.Add(supplier);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Route("/vendors/{id:int}/edit")]
+        [Route("Supplier/Edit/{id:int}")]
+        public IActionResult Edit(int id)
+        {
+            var supplier = _repository.GetById(id);
+            if (supplier == null)
+            {
+                return NotFound();
+            }
+
+            var model = new SupplierFormModel
+            {
+                Id = supplier.Id,
+                Name = supplier.Name,
+                Address = supplier.Address,
+                Phone = supplier.Phone,
+                Email = supplier.Email,
+                ContactPerson = supplier.ContactPerson,
+                RegistrationDate = supplier.RegistrationDate,
+                IsActive = supplier.IsActive
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/vendors/{id:int}/edit")]
+        [Route("Supplier/Edit/{id:int}")]
+        public IActionResult Edit(int id, SupplierFormModel model)
+        {
+            if (id != model.Id)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var supplier = _repository.GetById(id);
+            if (supplier == null)
+            {
+                return NotFound();
+            }
+
+            supplier.Name = model.Name;
+            supplier.Address = model.Address;
+            supplier.Phone = model.Phone;
+            supplier.Email = model.Email;
+            supplier.ContactPerson = model.ContactPerson;
+            supplier.RegistrationDate = model.RegistrationDate;
+            supplier.IsActive = model.IsActive;
+
+            _repository.Update(supplier);
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [Route("/vendors/{id:int}/delete")]
+        [Route("Supplier/Delete/{id:int}")]
+        public IActionResult Delete(int id)
+        {
+            var supplier = _repository.GetById(id);
+            if (supplier == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.CanDelete = _repository.CanDelete(id);
+            return View(supplier);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Delete")]
+        [Route("/vendors/{id:int}/delete")]
+        [Route("Supplier/Delete/{id:int}")]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var deleted = _repository.Delete(id);
+
+            if (!deleted)
+            {
+                var supplier = _repository.GetById(id);
+                if (supplier != null)
+                {
+                    ViewBag.CanDelete = false;
+                    ModelState.AddModelError("", "Cannot delete this supplier because it is used by one or more products.");
+                    return View(nameof(Delete), supplier);
+                }
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        [Route("/vendors/search")]
+        public IActionResult Search(string? term)
+        {
+            var suppliers = _repository.Search(term);
+            return PartialView("_SupplierTableRows", suppliers);
         }
     }
 }
