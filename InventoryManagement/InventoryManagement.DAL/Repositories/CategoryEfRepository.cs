@@ -30,5 +30,18 @@ namespace InventoryManagement.DAL.Repositories
                 .Include(c => c.Products)
                 .FirstOrDefault(c => c.Id == id);
         }
+
+        public List<Category> Search(string term, int maxResults = 10)
+        {
+            var query = _context.Categories.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                query = query.Where(c => c.Name.Contains(term));
+            }
+
+            return query.OrderBy(c => c.Name).Take(maxResults).ToList();
+        }
+        
     }
 }

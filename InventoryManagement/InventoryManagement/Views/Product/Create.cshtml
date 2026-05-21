@@ -1,5 +1,6 @@
 @using InventoryManagement.ViewModels.Product
 @using InventoryManagement.Domain.Enums
+@using InventoryManagement.ViewModels.Shared
 @model ProductFormModel
 
 @{
@@ -81,25 +82,36 @@
                             </div>
                         </div>
 
-                        <!-- Category ID -->
+                        <!-- Category & Supplier Autocomplete -->
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="CategoryId" class="form-label fw-semibold">Category ID</label>
-                                    <input asp-for="CategoryId" type="number" class="form-control" placeholder="Category ID" />
-                                    <small class="form-text text-muted">Autocomplete coming soon</small>
-                                    <span asp-validation-for="CategoryId" class="invalid-feedback d-block"></span>
-                                </div>
+                                @await Html.PartialAsync("_AutocompleteDropdown", new AutocompleteDropdownModel
+                                {
+                                    Label = "Category",
+                                    HiddenInputName = "CategoryId",
+                                    HiddenInputId = "CategoryId",
+                                    DisplayInputId = "CategoryDisplay",
+                                    SearchUrl = "/lookup/categories",
+                                    SelectedId = Model.CategoryId,
+                                    DisplayValue = Model.CategoryDisplayName,
+                                    Placeholder = "Search category...",
+                                    HelpText = "Start typing to search categories."
+                                })
                             </div>
 
-                            <!-- Supplier ID -->
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="SupplierId" class="form-label fw-semibold">Supplier ID</label>
-                                    <input asp-for="SupplierId" type="number" class="form-control" placeholder="Supplier ID" />
-                                    <small class="form-text text-muted">Autocomplete coming soon</small>
-                                    <span asp-validation-for="SupplierId" class="invalid-feedback d-block"></span>
-                                </div>
+                                @await Html.PartialAsync("_AutocompleteDropdown", new AutocompleteDropdownModel
+                                {
+                                    Label = "Supplier",
+                                    HiddenInputName = "SupplierId",
+                                    HiddenInputId = "SupplierId",
+                                    DisplayInputId = "SupplierDisplay",
+                                    SearchUrl = "/lookup/suppliers",
+                                    SelectedId = Model.SupplierId,
+                                    DisplayValue = Model.SupplierDisplayName,
+                                    Placeholder = "Search supplier...",
+                                    HelpText = "Start typing to search suppliers."
+                                })
                             </div>
                         </div>
 

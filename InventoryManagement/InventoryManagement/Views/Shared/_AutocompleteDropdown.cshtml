@@ -1,0 +1,40 @@
+@using InventoryManagement.ViewModels.Shared
+@model AutocompleteDropdownModel
+
+<div class="mb-3">
+    <label for="@Model.DisplayInputId" class="form-label fw-semibold">@Model.Label</label>
+    
+    <!-- Visible Display/Search Input -->
+    <input 
+        type="text"
+        id="@Model.DisplayInputId"
+        class="form-control autocomplete-display"
+        placeholder="@Model.Placeholder"
+        value="@Model.DisplayValue"
+        data-autocomplete="true"
+        data-search-url="@Model.SearchUrl"
+        data-hidden-input-id="@Model.HiddenInputId"
+        autocomplete="off" />
+    
+    <!-- Hidden ID Input (for form submission) -->
+    <input 
+        type="hidden"
+        id="@Model.HiddenInputId"
+        name="@Model.HiddenInputName"
+        value="@Model.SelectedId" />
+    
+    <!-- Validation Message -->
+    <span 
+        class="invalid-feedback d-block"
+        data-valmsg-for="@Model.HiddenInputName"
+        data-valmsg-replace="true"></span>
+    
+    <!-- Help Text -->
+    @if (!string.IsNullOrEmpty(Model.HelpText))
+    {
+        <small class="form-text text-muted">@Model.HelpText</small>
+    }
+    
+    <!-- AJAX Suggestions Container -->
+    <div id="@(Model.DisplayInputId)_suggestions" class="list-group mt-1" style="display: none;"></div>
+</div>
