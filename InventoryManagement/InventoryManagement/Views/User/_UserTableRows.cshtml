@@ -1,0 +1,52 @@
+@using System
+@using System.Linq
+@model IEnumerable<InventoryManagement.Domain.Models.User>
+
+@{
+    var users = Model?.ToList() ?? new List<InventoryManagement.Domain.Models.User>();
+}
+
+@if (!users.Any())
+{
+    <tr>
+        <td colspan="6" class="text-center text-muted py-4">No users found.</td>
+    </tr>
+}
+else
+{
+    @foreach (var item in users)
+    {
+        <tr>
+            <td class="ps-4">
+                <div class="fw-semibold">@item.FirstName @item.LastName</div>
+                <div class="text-muted small">@item.Email</div>
+            </td>
+            <td>@item.Role</td>
+            <td>@item.RegistrationDate.ToString("dd MMM yyyy")</td>
+            <td>@(item.Orders?.Count ?? 0)</td>
+            <td>
+                @if (item.IsActive)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm" role="group">
+                    <a href="/users/@item.Id" class="btn btn-outline-primary" title="View Details">
+                        Details
+                    </a>
+                    <a href="/users/@item.Id/edit" class="btn btn-outline-info" title="Edit User">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="/users/@item.Id/delete" class="btn btn-outline-danger" title="Delete User">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    }
+}

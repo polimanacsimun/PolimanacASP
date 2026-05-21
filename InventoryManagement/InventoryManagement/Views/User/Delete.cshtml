@@ -1,0 +1,107 @@
+@model InventoryManagement.Domain.Models.User
+
+@{
+    ViewData["Title"] = "Delete User";
+}
+
+<div class="container my-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a href="/users">Users</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Delete User</li>
+        </ol>
+    </nav>
+
+    <!-- Page header -->
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Delete User</h1>
+        <p class="text-muted mb-0">Confirm user account deletion.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <!-- Warning Alert -->
+            @if (!((bool?)ViewBag.CanDelete ?? true))
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Cannot Delete:</strong> This user has placed one or more orders and cannot be deleted.
+                    Please contact administration if this user account needs to be removed.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Warning:</strong> This action is permanent and cannot be undone. Deleting this user account will remove all associated records.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- User Details Card -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-light border-bottom">
+                    <strong>User Details</strong>
+                </div>
+
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">User ID</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
+
+                        <dt class="col-sm-4 text-muted">First Name</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model.FirstName</dd>
+
+                        <dt class="col-sm-4 text-muted">Last Name</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model.LastName</dd>
+
+                        <dt class="col-sm-4 text-muted">Email</dt>
+                        <dd class="col-sm-8">@Model.Email</dd>
+
+                        <dt class="col-sm-4 text-muted">Role</dt>
+                        <dd class="col-sm-8">@Model.Role</dd>
+
+                        <dt class="col-sm-4 text-muted">Registration Date</dt>
+                        <dd class="col-sm-8">@Model.RegistrationDate.ToString("dd MMM yyyy")</dd>
+
+                        <dt class="col-sm-4 text-muted">Status</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Orders Placed</dt>
+                        <dd class="col-sm-8">@(Model.Orders?.Count ?? 0)</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex gap-2">
+                @if ((bool?)ViewBag.CanDelete ?? true)
+                {
+                    <form method="post" action="/users/@Model.Id/delete" class="me-2">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Delete User
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger disabled" disabled>
+                        <i class="bi bi-trash"></i> Delete User
+                    </button>
+                }
+                <a href="/users/@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
