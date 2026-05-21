@@ -1,0 +1,129 @@
+@using InventoryManagement.Domain.Enums
+@model InventoryManagement.ViewModels.Warehouse.WarehouseFormModel
+
+@{
+    ViewData["Title"] = "Edit Warehouse";
+}
+
+<div class="container my-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a href="/storage">Warehouses</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Warehouse</li>
+        </ol>
+    </nav>
+
+    <!-- Page header -->
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Edit Warehouse</h1>
+        <p class="text-muted mb-0">Modify warehouse information and settings.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light border-bottom">
+                    <strong>Warehouse Details</strong>
+                </div>
+
+                <div class="card-body">
+                    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" novalidate>
+                        <!-- Validation Summary -->
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div asp-validation-summary="All" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>Please correct the following errors:</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
+                        <!-- Hidden ID -->
+                        <input asp-for="Id" type="hidden" />
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Warehouse Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="e.g., Main Warehouse" />
+                            <span asp-validation-for="Name" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">Address</label>
+                            <input asp-for="Address" class="form-control" placeholder="e.g., 123 Industrial Ave, City" />
+                            <span asp-validation-for="Address" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Capacity -->
+                        <div class="mb-3">
+                            <label asp-for="Capacity" class="form-label">Capacity (units)</label>
+                            <input asp-for="Capacity" class="form-control" placeholder="e.g., 10000" />
+                            <span asp-validation-for="Capacity" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label">Phone</label>
+                            <input asp-for="Phone" class="form-control" placeholder="e.g., +1 234 567 8900" />
+                            <span asp-validation-for="Phone" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="e.g., warehouse@company.com" />
+                            <span asp-validation-for="Email" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Manager -->
+                        <div class="mb-3">
+                            <label asp-for="Manager" class="form-label">Manager</label>
+                            <input asp-for="Manager" class="form-control" placeholder="e.g., John Smith" />
+                            <span asp-validation-for="Manager" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Opening Date -->
+                        <div class="mb-3">
+                            <label asp-for="OpeningDate" class="form-label">Opening Date</label>
+                            <input asp-for="OpeningDate" type="date" class="form-control" />
+                            <span asp-validation-for="OpeningDate" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Type -->
+                        <div class="mb-3">
+                            <label asp-for="Type" class="form-label">Warehouse Type</label>
+                            <select asp-for="Type" asp-items="Html.GetEnumSelectList<WarehouseType>()" class="form-select"></select>
+                            <span asp-validation-for="Type" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- IsActive -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsActive" class="form-check-label">Active Warehouse</label>
+                                <span asp-validation-for="IsActive" class="invalid-feedback d-block"></span>
+                            </div>
+                        </div>
+
+                        <!-- Anti-forgery token -->
+                        @Html.AntiForgeryToken()
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Save Changes
+                            </button>
+                            <a href="/storage/@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

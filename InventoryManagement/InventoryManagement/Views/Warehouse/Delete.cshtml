@@ -1,0 +1,116 @@
+@model InventoryManagement.Domain.Models.Warehouse
+
+@{
+    ViewData["Title"] = "Delete Warehouse";
+}
+
+<div class="container my-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a href="/storage">Warehouses</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Delete Warehouse</li>
+        </ol>
+    </nav>
+
+    <!-- Page header -->
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Delete Warehouse</h1>
+        <p class="text-muted mb-0">Confirm warehouse deletion.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <!-- Warning Alert -->
+            @if (!((bool?)ViewBag.CanDelete ?? true))
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Cannot Delete:</strong> This warehouse is currently used by one or more inventory items.
+                    Please remove all inventory records from this warehouse before attempting to delete it.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Warning:</strong> This action is permanent and cannot be undone. Deleting this warehouse will remove all associated records.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Warehouse Details Card -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-light border-bottom">
+                    <strong>Warehouse Details</strong>
+                </div>
+
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Warehouse ID</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
+
+                        <dt class="col-sm-4 text-muted">Name</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model.Name</dd>
+
+                        <dt class="col-sm-4 text-muted">Address</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Address) ? "—" : Model.Address)</dd>
+
+                        <dt class="col-sm-4 text-muted">Capacity</dt>
+                        <dd class="col-sm-8">@Model.Capacity units</dd>
+
+                        <dt class="col-sm-4 text-muted">Phone</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Phone) ? "—" : Model.Phone)</dd>
+
+                        <dt class="col-sm-4 text-muted">Email</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Email) ? "—" : Model.Email)</dd>
+
+                        <dt class="col-sm-4 text-muted">Manager</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Manager) ? "—" : Model.Manager)</dd>
+
+                        <dt class="col-sm-4 text-muted">Opening Date</dt>
+                        <dd class="col-sm-8">@Model.OpeningDate.ToString("dd MMM yyyy")</dd>
+
+                        <dt class="col-sm-4 text-muted">Type</dt>
+                        <dd class="col-sm-8">@Model.Type</dd>
+
+                        <dt class="col-sm-4 text-muted">Status</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Inventory Items</dt>
+                        <dd class="col-sm-8">@(Model.InventoryItems?.Count ?? 0)</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex gap-2">
+                @if ((bool?)ViewBag.CanDelete ?? true)
+                {
+                    <form method="post" action="/storage/@Model.Id/delete" class="me-2">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Delete Warehouse
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger disabled" disabled>
+                        <i class="bi bi-trash"></i> Delete Warehouse
+                    </button>
+                }
+                <a href="/storage/@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>

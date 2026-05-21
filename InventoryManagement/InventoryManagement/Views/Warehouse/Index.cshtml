@@ -24,8 +24,11 @@
             <h1 class="h3 mb-1">Warehouses</h1>
             <p class="text-muted mb-0">Overview of the warehouse network, capacity and operational status.</p>
         </div>
-        <div class="mt-3 mt-md-0">
-            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Dashboard</a>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <a href="/storage/create" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle"></i> Create Warehouse
+            </a>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
         </div>
     </header>
 
@@ -92,77 +95,44 @@
     else
     {
         <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-8">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-0">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="warehouseSearchInput" class="form-control border-start-0" placeholder="Search by name, address, phone, email, manager or type..." />
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button type="button" id="clearWarehouseSearch" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-x-circle"></i> Clear
+                        </button>
+                        <span id="warehouseSearchLoading" class="ms-2" style="display: none;">
+                            <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+                            <small class="text-muted ms-1">Searching...</small>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0 align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th scope="col">Name</th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Address</th>
-                                <th scope="col" class="text-end">Capacity</th>
+                                <th scope="col">Capacity</th>
+                                <th scope="col">Phone</th>
+                                <th scope="col">Email</th>
                                 <th scope="col">Manager</th>
-                                <th scope="col">Opening Date</th>
-                                <th scope="col">Inventory</th>
                                 <th scope="col">Status</th>
                                 <th scope="col" class="text-end">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach (var w in warehouses)
-                            {
-                                var name = w?.Name ?? "—";
-                                var address = w?.Address ?? "—";
-                                var capacity = w?.Capacity ?? 0;
-                                var manager = w?.Manager ?? "—";
-                                var opening = w?.OpeningDate;
-                                var inventoryCount = w?.InventoryItems?.Count ?? 0;
-                                var isActive = w?.IsActive ?? false;
-                                var typeClass = "bg-secondary";
-                                if (w != null)
-                                {
-                                    switch (w.Type)
-                                    {
-                                        case WarehouseType.Main:
-                                            typeClass = "bg-primary"; break;
-                                        case WarehouseType.Regional:
-                                            typeClass = "bg-info text-dark"; break;
-                                        case WarehouseType.Distribution:
-                                            typeClass = "bg-warning text-dark"; break;
-                                        default:
-                                            typeClass = "bg-secondary"; break;
-                                    }
-                                }
-
-                                <tr>
-                                    <td>
-                                        <div class="fw-semibold">@name</div>
-                                        <div class="text-muted small">ID: @w?.Id</div>
-                                    </td>
-                                    <td>
-                                        <span class="badge @typeClass">@((w != null) ? w.Type.ToString() : "—")</span>
-                                    </td>
-                                    <td style="min-width:220px;">@address</td>
-                                    <td class="text-end">@string.Format("{0:N0}", capacity)</td>
-                                    <td>@manager</td>
-                                    <td>@(opening.HasValue ? opening.Value.ToString("yyyy-MM-dd") : "—")</td>
-                                    <td>@inventoryCount</td>
-                                    <td>
-                                        @if (isActive)
-                                        {
-                                            <span class="badge bg-success">Active</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Inactive</span>
-                                        }
-                                    </td>
-                                    <td class="text-end">
-                                        <a asp-controller="Warehouse" asp-action="Details" asp-route-id="@w?.Id" class="btn btn-sm btn-outline-primary me-2">Details</a>
-                                        <a asp-controller="Warehouse" asp-action="Index" class="btn btn-sm btn-light" aria-disabled="true">View</a>
-                                    </td>
-                                </tr>
-                            }
+                        <tbody id="warehouseTableBody">
+                            @await Html.PartialAsync("_WarehouseTableRows", warehouses)
                         </tbody>
                     </table>
                 </div>
@@ -179,3 +149,66 @@
         <div><a asp-controller="Home" asp-action="Index">Back to Home</a></div>
     </footer>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            let searchTimeout;
+
+            // Handle warehouse search input
+            $('#warehouseSearchInput').on('input', function() {
+                clearTimeout(searchTimeout);
+                const term = $(this).val().trim();
+
+                // Show loading indicator
+                $('#warehouseSearchLoading').show();
+
+                // Debounce search requests (300ms)
+                searchTimeout = setTimeout(function() {
+                    $.ajax({
+                        url: '/storage/search',
+                        data: { term: term },
+                        method: 'GET',
+                        timeout: 5000,
+                        success: function(html) {
+                            // Fade out and replace content
+                            $('#warehouseTableBody').fadeOut(150, function() {
+                                $(this).html(html).fadeIn(150);
+                            });
+                        },
+                        error: function() {
+                            $('#warehouseTableBody').html('<tr><td colspan="7" class="text-center text-danger py-4">Error loading results. Please try again.</td></tr>');
+                        },
+                        complete: function() {
+                            // Hide loading indicator
+                            $('#warehouseSearchLoading').hide();
+                        }
+                    });
+                }, 300);
+            });
+
+            // Handle clear button
+            $('#clearWarehouseSearch').on('click', function() {
+                $('#warehouseSearchInput').val('').focus();
+                clearTimeout(searchTimeout);
+                $('#warehouseSearchLoading').show();
+
+                // Reload all warehouses
+                $.ajax({
+                    url: '/storage/search',
+                    data: { term: '' },
+                    method: 'GET',
+                    timeout: 5000,
+                    success: function(html) {
+                        $('#warehouseTableBody').fadeOut(150, function() {
+                            $(this).html(html).fadeIn(150);
+                        });
+                    },
+                    complete: function() {
+                        $('#warehouseSearchLoading').hide();
+                    }
+                });
+            });
+        });
+    </script>
+}
