@@ -36,5 +36,50 @@ namespace InventoryManagement.DAL.Repositories
                     .ThenInclude(oi => oi.Order)
                 .FirstOrDefault(p => p.Id == id);
         }
+
+        public void Add(Product product)
+        {
+            _context.Products.Add(product);
+            _context.SaveChanges();
+        }
+
+        public void Update(Product product)
+        {
+            _context.Products.Update(product);
+            _context.SaveChanges();
+        }
+
+        public bool Delete(int id)
+        {
+            var product = _context.Products.FirstOrDefault(p => p.Id == id);
+
+            if (product == null)
+                return false;
+
+            if (!CanDelete(id))
+                return false;
+
+            _context.Products.Remove(product);
+            _context.SaveChanges();
+            return true;
+        }
+
+        public bool Exists(int id)
+        {
+            return _context.Products.Any(p => p.Id == id);
+        }
+
+        public bool CanDelete(int id)
+        {
+            var product = _context.Products
+                .Include(p => p.OrderItems)
+                .Include(p => p.InventoryItems)
+                .FirstOrDefault(p => p.Id == id);
+
+            if (product == null)
+                return false;
+
+            return !product.OrderItems.Any() && !product.InventoryItems.Any();
+        }
     }
 }

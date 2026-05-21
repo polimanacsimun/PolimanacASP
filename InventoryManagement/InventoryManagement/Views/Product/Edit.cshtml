@@ -1,0 +1,156 @@
+@using InventoryManagement.ViewModels.Product
+@using InventoryManagement.Domain.Enums
+@model ProductFormModel
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-pencil-square"></i> Edit Product
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <form method="post" class="needs-validation" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <!-- Hidden ID -->
+                        <input asp-for="Id" type="hidden" />
+
+                        <!-- Product Name -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-semibold">Product Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter product name" />
+                            <span asp-validation-for="Name" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-semibold">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter product description"></textarea>
+                            <span asp-validation-for="Description" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Price" class="form-label fw-semibold">Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input asp-for="Price" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                                    </div>
+                                    <span asp-validation-for="Price" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <!-- Unit of Measure -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="UnitOfMeasure" class="form-label fw-semibold">Unit of Measure</label>
+                                    <input asp-for="UnitOfMeasure" class="form-control" placeholder="e.g., unit, ream, license" />
+                                    <span asp-validation-for="UnitOfMeasure" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Minimum Stock -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="MinimumStock" class="form-label fw-semibold">Minimum Stock</label>
+                                    <input asp-for="MinimumStock" type="number" class="form-control" placeholder="0" />
+                                    <span asp-validation-for="MinimumStock" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <!-- Type -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Type" class="form-label fw-semibold">Product Type</label>
+                                    <select asp-for="Type" asp-items="Html.GetEnumSelectList<ProductType>()" class="form-select">
+                                        <option value="">-- Select Type --</option>
+                                    </select>
+                                    <span asp-validation-for="Type" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category ID -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CategoryId" class="form-label fw-semibold">Category ID</label>
+                                    <input asp-for="CategoryId" type="number" class="form-control" placeholder="Category ID" />
+                                    <small class="form-text text-muted">
+                                        @if (!string.IsNullOrEmpty(Model.CategoryDisplayName))
+                                        {
+                                            <span>Currently: <strong>@Model.CategoryDisplayName</strong></span>
+                                        }
+                                    </small>
+                                    <span asp-validation-for="CategoryId" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <!-- Supplier ID -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="SupplierId" class="form-label fw-semibold">Supplier ID</label>
+                                    <input asp-for="SupplierId" type="number" class="form-control" placeholder="Supplier ID" />
+                                    <small class="form-text text-muted">
+                                        @if (!string.IsNullOrEmpty(Model.SupplierDisplayName))
+                                        {
+                                            <span>Currently: <strong>@Model.SupplierDisplayName</strong></span>
+                                        }
+                                    </small>
+                                    <span asp-validation-for="SupplierId" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Created At -->
+                        <div class="mb-3">
+                            <label asp-for="CreatedAt" class="form-label fw-semibold">Creation Date</label>
+                            <input asp-for="CreatedAt" type="date" class="form-control" />
+                            <span asp-validation-for="CreatedAt" class="invalid-feedback d-block"></span>
+                        </div>
+
+                        <!-- Is Active -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" id="IsActive" />
+                                <label asp-for="IsActive" class="form-check-label fw-semibold">
+                                    Product is Active
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-info btn-lg text-white">
+                                <i class="bi bi-check-circle"></i> Save Changes
+                            </button>
+                            <a href="@Url.RouteUrl("ProductCatalogDetails", new { id = Model.Id })" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

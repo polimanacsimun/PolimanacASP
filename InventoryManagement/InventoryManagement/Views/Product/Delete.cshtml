@@ -1,0 +1,137 @@
+@using InventoryManagement.Domain.Models
+@model Product
+@{
+    ViewData["Title"] = "Delete Product";
+    bool canDelete = (bool?)ViewBag.CanDelete ?? false;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Delete Product
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Delete Confirmation Alert -->
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <strong>Warning:</strong> This action cannot be undone. Please review the product details below before confirming deletion.
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-muted">Product ID</label>
+                                <p class="fs-5">@Model.Id</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-muted">Product Type</label>
+                                <p class="fs-5">
+                                    <span class="badge bg-secondary">@Model.Type</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-muted">Product Name</label>
+                        <p class="fs-5">@Model.Name</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-muted">Description</label>
+                        <p>@(string.IsNullOrEmpty(Model.Description) ? "N/A" : Model.Description)</p>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-muted">Price</label>
+                            <p class="fs-5">$@Model.Price.ToString("F2")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-muted">Category</label>
+                            <p class="fs-5">
+                                @if (Model.Category != null)
+                                {
+                                    <span>@Model.Category.Name</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-muted">Supplier</label>
+                            <p class="fs-5">
+                                @if (Model.Supplier != null)
+                                {
+                                    <span>@Model.Supplier.Name</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-muted">Status</label>
+                            <p class="fs-5">
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Delete Restriction Warning -->
+                    @if (!canDelete)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-lock-fill"></i>
+                            <strong>Cannot Delete:</strong> This product is currently used in one or more orders or inventory records. Remove all related items before attempting deletion.
+                        </div>
+                    }
+
+                    <!-- Form Actions -->
+                    <div class="d-flex gap-2">
+                        @if (canDelete)
+                        {
+                            <form method="post" style="display: inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="bi bi-trash"></i> Delete Product
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-danger btn-lg disabled" disabled>
+                                <i class="bi bi-trash"></i> Delete Product
+                            </button>
+                        }
+
+                        <a href="@Url.RouteUrl("ProductCatalog")" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
