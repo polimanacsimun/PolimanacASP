@@ -32,6 +32,12 @@ builder.Services
     .AddEntityFrameworkStores<InventoryManagementDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+
 // Existing EF repositories
 builder.Services.AddScoped<ProductEfRepository>();
 builder.Services.AddScoped<SupplierEfRepository>();

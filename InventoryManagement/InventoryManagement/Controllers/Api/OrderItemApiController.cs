@@ -3,11 +3,13 @@ using InventoryManagement.Domain.Models;
 using InventoryManagement.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryManagement.Controllers.Api
 {
     [ApiController]
     [Route("api/order-items")]
+    [Authorize(Roles = "Admin,Manager")]
     public class OrderItemApiController : ControllerBase
     {
         private readonly InventoryManagementDbContext _dbContext;
@@ -21,6 +23,7 @@ namespace InventoryManagement.Controllers.Api
         // GET: /api/order-items?q=ORD-2026
         // GET: /api/order-items?q=Business Laptop
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<OrderItemDto>>> GetAll([FromQuery] string? q)
         {
             IQueryable<OrderItem> query = _dbContext.OrderItems
@@ -46,6 +49,7 @@ namespace InventoryManagement.Controllers.Api
 
         // GET: /api/order-items/5
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<OrderItemDto>> GetById(int id)
         {
             var orderItem = await _dbContext.OrderItems
@@ -202,6 +206,7 @@ namespace InventoryManagement.Controllers.Api
 
         // DELETE: /api/order-items/5
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var orderItem = await _dbContext.OrderItems

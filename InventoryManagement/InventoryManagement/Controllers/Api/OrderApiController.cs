@@ -4,11 +4,13 @@ using InventoryManagement.Domain.Models;
 using InventoryManagement.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryManagement.Controllers.Api
 {
     [ApiController]
     [Route("api/orders")]
+    [Authorize(Roles = "Admin,Manager")]
     public class OrderApiController : ControllerBase
     {
         private readonly InventoryManagementDbContext _dbContext;
@@ -176,6 +178,7 @@ namespace InventoryManagement.Controllers.Api
 
         // DELETE: /api/orders/5
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var order = await _dbContext.Orders

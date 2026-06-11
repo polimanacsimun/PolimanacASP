@@ -4,11 +4,13 @@ using InventoryManagement.Domain.Models;
 using InventoryManagement.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryManagement.Controllers.Api
 {
     [ApiController]
     [Route("api/warehouses")]
+    [Authorize(Roles = "Admin,Manager")]
     public class WarehouseApiController : ControllerBase
     {
         private readonly InventoryManagementDbContext _dbContext;
@@ -21,6 +23,7 @@ namespace InventoryManagement.Controllers.Api
         // GET: /api/warehouses
         // GET: /api/warehouses?q=main
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<WarehouseDto>>> GetAll([FromQuery] string? q)
         {
             IQueryable<Warehouse> query = _dbContext.Warehouses
@@ -54,6 +57,7 @@ namespace InventoryManagement.Controllers.Api
 
         // GET: /api/warehouses/5
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<WarehouseDto>> GetById(int id)
         {
             var warehouse = await _dbContext.Warehouses
@@ -155,6 +159,7 @@ namespace InventoryManagement.Controllers.Api
 
         // DELETE: /api/warehouses/5
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var warehouse = await _dbContext.Warehouses

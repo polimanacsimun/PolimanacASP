@@ -3,6 +3,7 @@ using InventoryManagement.Domain.Models;
 using InventoryManagement.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryManagement.Controllers.Api
 {
@@ -20,6 +21,7 @@ namespace InventoryManagement.Controllers.Api
         // GET: /api/categories
         // GET: /api/categories?q=office
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAll([FromQuery] string? q)
         {
             IQueryable<Category> query = _dbContext.Categories
@@ -41,6 +43,7 @@ namespace InventoryManagement.Controllers.Api
 
         // GET: /api/categories/5
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<CategoryDto>> GetById(int id)
         {
             var category = await _dbContext.Categories
@@ -106,6 +109,7 @@ namespace InventoryManagement.Controllers.Api
 
         // DELETE: /api/categories/5
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var category = await _dbContext.Categories

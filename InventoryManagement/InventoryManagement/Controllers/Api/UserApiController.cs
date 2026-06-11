@@ -4,11 +4,13 @@ using InventoryManagement.Domain.Models;
 using InventoryManagement.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryManagement.Controllers.Api
 {
     [ApiController]
     [Route("api/users")]
+    [Authorize(Roles = "Admin,Manager")]
     public class UserApiController : ControllerBase
     {
         private readonly InventoryManagementDbContext _dbContext;
@@ -21,6 +23,7 @@ namespace InventoryManagement.Controllers.Api
         // GET: /api/users
         // GET: /api/users?q=toni
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAll([FromQuery] string? q)
         {
             IQueryable<User> query = _dbContext.BusinessUsers
@@ -53,6 +56,7 @@ namespace InventoryManagement.Controllers.Api
 
         // GET: /api/users/5
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<UserDto>> GetById(int id)
         {
             var user = await _dbContext.BusinessUsers
@@ -145,6 +149,7 @@ namespace InventoryManagement.Controllers.Api
 
         // DELETE: /api/users/5
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var user = await _dbContext.BusinessUsers

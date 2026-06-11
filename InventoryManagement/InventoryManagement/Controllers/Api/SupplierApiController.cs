@@ -3,11 +3,13 @@ using InventoryManagement.Domain.Models;
 using InventoryManagement.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryManagement.Controllers.Api
 {
     [ApiController]
     [Route("api/suppliers")]
+    [Authorize(Roles = "Admin,Manager")]
     public class SupplierApiController : ControllerBase
     {
         private readonly InventoryManagementDbContext _dbContext;
@@ -20,6 +22,7 @@ namespace InventoryManagement.Controllers.Api
         // GET: /api/suppliers
         // GET: /api/suppliers?q=alpha
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<SupplierDto>>> GetAll([FromQuery] string? q)
         {
             IQueryable<Supplier> query = _dbContext.Suppliers
@@ -47,6 +50,7 @@ namespace InventoryManagement.Controllers.Api
 
         // GET: /api/suppliers/5
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<SupplierDto>> GetById(int id)
         {
             var supplier = await _dbContext.Suppliers
@@ -123,6 +127,7 @@ namespace InventoryManagement.Controllers.Api
 
         // DELETE: /api/suppliers/5
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var supplier = await _dbContext.Suppliers
