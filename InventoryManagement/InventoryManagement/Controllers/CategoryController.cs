@@ -16,8 +16,8 @@ namespace InventoryManagement.Controllers
             _repository = repository;
         }
 
-        [Route("/categories")]
         [AllowAnonymous]
+        [Route("/categories")]
         public IActionResult Index()
         {
             var categories = _repository.GetAll();
@@ -36,20 +36,20 @@ namespace InventoryManagement.Controllers
             return View(category);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/categories/create")]
         [Route("Category/Create")]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new CategoryFormModel();
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/categories/create")]
         [Route("Category/Create")]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(CategoryFormModel model)
         {
             if (!ModelState.IsValid)
@@ -67,6 +67,7 @@ namespace InventoryManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/categories/{id:int}/edit")]
         [Route("Category/Edit/{id:int}")]
         public IActionResult Edit(int id)
@@ -87,6 +88,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/categories/{id:int}/edit")]
@@ -116,6 +118,7 @@ namespace InventoryManagement.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("/categories/{id:int}/delete")]
         [Route("Category/Delete/{id:int}")]
         public IActionResult Delete(int id)
@@ -130,6 +133,7 @@ namespace InventoryManagement.Controllers
             return View(category);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("Delete")]
@@ -154,6 +158,7 @@ namespace InventoryManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [Route("/categories/search")]
         public IActionResult Search(string? term)
