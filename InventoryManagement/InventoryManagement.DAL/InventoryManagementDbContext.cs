@@ -1,4 +1,4 @@
-﻿using InventoryManagement.Domain.Models;
+using InventoryManagement.Domain.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +11,6 @@ namespace InventoryManagement.DAL
         {
         }
 
-        // DbSet properties for all entities
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
@@ -20,24 +19,22 @@ namespace InventoryManagement.DAL
         public DbSet<User> BusinessUsers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<ProductAttachment> ProductAttachments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure Product entity
             modelBuilder.Entity<Product>()
                 .Property(p => p.Price)
                 .HasColumnType("decimal(18,2)")
                 .IsRequired();
 
-            // Configure Order entity
             modelBuilder.Entity<Order>()
                 .Property(o => o.TotalPrice)
                 .HasColumnType("decimal(18,2)")
                 .IsRequired();
 
-            // Configure OrderItem entity
             modelBuilder.Entity<OrderItem>()
                 .Property(oi => oi.UnitPrice)
                 .HasColumnType("decimal(18,2)")
@@ -53,71 +50,79 @@ namespace InventoryManagement.DAL
                 .HasColumnType("decimal(18,2)")
                 .IsRequired();
 
-            // Configure InventoryItem unique constraint on ProductId + WarehouseId
             modelBuilder.Entity<InventoryItem>()
                 .HasIndex(ii => new { ii.ProductId, ii.WarehouseId })
                 .IsUnique();
 
-            // Configure relationships if needed
-            // Category 1-N Product (already defined in Product via CategoryId FK)
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Category)
                 .WithMany(c => c.Products)
                 .HasForeignKey(p => p.CategoryId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Supplier 1-N Product (already defined in Product via SupplierId FK)
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Supplier)
                 .WithMany(s => s.Products)
                 .HasForeignKey(p => p.SupplierId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Warehouse 1-N InventoryItem
             modelBuilder.Entity<InventoryItem>()
                 .HasOne(ii => ii.Warehouse)
                 .WithMany(w => w.InventoryItems)
                 .HasForeignKey(ii => ii.WarehouseId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Product 1-N InventoryItem
             modelBuilder.Entity<InventoryItem>()
-    .HasOne(ii => ii.Product)
-    .WithMany(p => p.InventoryItems)
-    .HasForeignKey(ii => ii.ProductId)
-    .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(ii => ii.Product)
+                .WithMany(p => p.InventoryItems)
+                .HasForeignKey(ii => ii.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // User 1-N Order
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.User)
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Order 1-N OrderItem
             modelBuilder.Entity<OrderItem>()
                 .HasOne(oi => oi.Order)
                 .WithMany(o => o.OrderItems)
                 .HasForeignKey(oi => oi.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Product 1-N OrderItem
-modelBuilder.Entity<OrderItem>()
-    .HasOne(oi => oi.Product)
-    .WithMany(p => p.OrderItems)
-    .HasForeignKey(oi => oi.ProductId)
-    .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(oi => oi.Product)
+                .WithMany(p => p.OrderItems)
+                .HasForeignKey(oi => oi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Seed data
-            
-            // Categories
+            modelBuilder.Entity<ProductAttachment>()
+                .Property(a => a.FileName)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            modelBuilder.Entity<ProductAttachment>()
+                .Property(a => a.FilePath)
+                .HasMaxLength(500)
+                .IsRequired();
+
+            modelBuilder.Entity<ProductAttachment>()
+                .Property(a => a.ContentType)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<ProductAttachment>()
+                .HasOne(a => a.Product)
+                .WithMany(p => p.Attachments)
+                .HasForeignKey(a => a.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Electronics", Description = "Electronic devices and equipment" },
                 new Category { Id = 2, Name = "Office Supplies", Description = "Office supplies and stationery" },
                 new Category { Id = 3, Name = "Consumables", Description = "Consumable items and disposables" }
             );
 
-            // Suppliers
             modelBuilder.Entity<Supplier>().HasData(
                 new Supplier
                 {
@@ -143,7 +148,6 @@ modelBuilder.Entity<OrderItem>()
                 }
             );
 
-            // Products
             modelBuilder.Entity<Product>().HasData(
                 new Product
                 {
@@ -189,7 +193,6 @@ modelBuilder.Entity<OrderItem>()
                 }
             );
 
-            // Warehouses
             modelBuilder.Entity<Warehouse>().HasData(
                 new Warehouse
                 {
@@ -221,7 +224,6 @@ modelBuilder.Entity<OrderItem>()
 
             modelBuilder.Entity<User>().ToTable("Users");
 
-            // Users
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
@@ -255,7 +257,6 @@ modelBuilder.Entity<OrderItem>()
                 }
             );
 
-            // Orders
             modelBuilder.Entity<Order>().HasData(
                 new Order
                 {
@@ -292,7 +293,6 @@ modelBuilder.Entity<OrderItem>()
                 }
             );
 
-            // OrderItems
             modelBuilder.Entity<OrderItem>().HasData(
                 new OrderItem
                 {
@@ -329,7 +329,6 @@ modelBuilder.Entity<OrderItem>()
                 }
             );
 
-            // InventoryItems
             modelBuilder.Entity<InventoryItem>().HasData(
                 new InventoryItem
                 {
