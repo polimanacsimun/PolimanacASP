@@ -11,24 +11,23 @@ namespace InventoryManagement.Controllers
     {
         private readonly ProductEfRepository _repository;
 
-public ProductController(ProductEfRepository repository)
-{
-    _repository = repository;
-}
+        public ProductController(ProductEfRepository repository)
+        {
+            _repository = repository;
+        }
 
+        [AllowAnonymous]
         [Route("catalog", Name = "ProductCatalog")]
         [Route("Product")]
-        [Route("Product/Index")]        
-        [AllowAnonymous]
+        [Route("Product/Index")]
         public IActionResult Index()
         {
             var products = _repository.GetAll();
             return View(products);
         }
 
-        
-[Route("Product/Details/{id:int}")]
-[Route("catalog/{id:int}", Name = "ProductCatalogDetails")]
+        [Route("Product/Details/{id:int}")]
+        [Route("catalog/{id:int}", Name = "ProductCatalogDetails")]
         public IActionResult Details(int id)
         {
             var product = _repository.GetById(id);
@@ -40,9 +39,9 @@ public ProductController(ProductEfRepository repository)
             return View(product);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("catalog/create")]
         [Route("Product/Create")]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new ProductFormModel
@@ -50,14 +49,15 @@ public ProductController(ProductEfRepository repository)
                 CreatedAt = DateTime.Today,
                 IsActive = true
             };
+
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("catalog/create")]
         [Route("Product/Create")]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(ProductFormModel model)
         {
             if (!ModelState.IsValid)
@@ -70,6 +70,10 @@ public ProductController(ProductEfRepository repository)
                 Name = model.Name,
                 Description = model.Description,
                 Price = model.Price,
+                UnitOfMeasure = model.UnitOfMeasure,
+                MinimumStock = model.MinimumStock,
+                CreatedAt = model.CreatedAt,
+                IsActive = model.IsActive,
                 Type = model.Type,
                 CategoryId = model.CategoryId,
                 SupplierId = model.SupplierId
@@ -80,6 +84,7 @@ public ProductController(ProductEfRepository repository)
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("catalog/{id:int}/edit")]
         [Route("Product/Edit/{id:int}")]
         public IActionResult Edit(int id)
@@ -96,6 +101,10 @@ public ProductController(ProductEfRepository repository)
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
+                UnitOfMeasure = product.UnitOfMeasure,
+                MinimumStock = product.MinimumStock,
+                CreatedAt = product.CreatedAt,
+                IsActive = product.IsActive,
                 Type = product.Type,
                 CategoryId = product.CategoryId,
                 CategoryDisplayName = product.Category?.Name,
@@ -106,6 +115,7 @@ public ProductController(ProductEfRepository repository)
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("catalog/{id:int}/edit")]
@@ -131,6 +141,10 @@ public ProductController(ProductEfRepository repository)
             product.Name = model.Name;
             product.Description = model.Description;
             product.Price = model.Price;
+            product.UnitOfMeasure = model.UnitOfMeasure;
+            product.MinimumStock = model.MinimumStock;
+            product.CreatedAt = model.CreatedAt;
+            product.IsActive = model.IsActive;
             product.Type = model.Type;
             product.CategoryId = model.CategoryId;
             product.SupplierId = model.SupplierId;
@@ -140,6 +154,7 @@ public ProductController(ProductEfRepository repository)
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("catalog/{id:int}/delete")]
         [Route("Product/Delete/{id:int}")]
         public IActionResult Delete(int id)
@@ -154,6 +169,7 @@ public ProductController(ProductEfRepository repository)
             return View(product);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("Delete")]
@@ -162,7 +178,7 @@ public ProductController(ProductEfRepository repository)
         public IActionResult DeleteConfirmed(int id)
         {
             var deleted = _repository.Delete(id);
-            
+
             if (!deleted)
             {
                 var product = _repository.GetById(id);
@@ -172,6 +188,7 @@ public ProductController(ProductEfRepository repository)
                     ModelState.AddModelError("", "Cannot delete this product because it has related orders or inventory items.");
                     return View(nameof(Delete), product);
                 }
+
                 return NotFound();
             }
 
@@ -179,6 +196,7 @@ public ProductController(ProductEfRepository repository)
             return RedirectToAction(nameof(Index));
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [Route("catalog/search")]
         public IActionResult Search(string? term)
