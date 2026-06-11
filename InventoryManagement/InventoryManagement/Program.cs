@@ -3,6 +3,7 @@ using InventoryManagement.DAL.Repositories;
 using InventoryManagement.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using InventoryManagement.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,11 @@ builder.Services.AddScoped<InventoryItemEfRepository>();
 builder.Services.AddScoped<OrderItemEfRepository>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    await IdentitySeedData.SeedAsync(scope.ServiceProvider);
+}
 
 if (!app.Environment.IsDevelopment())
 {
