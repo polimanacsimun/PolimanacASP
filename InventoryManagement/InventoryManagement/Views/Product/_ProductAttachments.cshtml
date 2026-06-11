@@ -1,0 +1,66 @@
+@model IEnumerable<InventoryManagement.Domain.Models.ProductAttachment>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-light border mb-0">
+        No attachments uploaded for this product yet.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Uploaded</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var attachment in Model)
+                {
+                    <tr>
+                        <td>
+                            <a href="@attachment.FilePath" target="_blank" rel="noopener">
+                                @attachment.FileName
+                            </a>
+                        </td>
+                        <td>@attachment.ContentType</td>
+                        <td>@FormatFileSize(attachment.FileSize)</td>
+                        <td>@attachment.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td class="text-end">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger js-delete-attachment"
+                                        data-attachment-id="@attachment.Id">
+                                    Delete
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@functions {
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024)
+        {
+            return $"{bytes} B";
+        }
+
+        if (bytes < 1024 * 1024)
+        {
+            return $"{bytes / 1024d:0.##} KB";
+        }
+
+        return $"{bytes / 1024d / 1024d:0.##} MB";
+    }
+}
