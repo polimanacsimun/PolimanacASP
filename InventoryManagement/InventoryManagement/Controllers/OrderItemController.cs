@@ -16,25 +16,17 @@ namespace InventoryManagement.Controllers
             _repository = repository;
         }
 
-        /// <summary>
-        /// Displays list of all order items.
-        /// Supports both semantic (/order-items) and legacy (/OrderItem) routes.
-        /// </summary>
+        [AllowAnonymous]
         [Route("/order-items")]
         [Route("/OrderItem")]
         [Route("/OrderItem/Index")]
         [HttpGet]
-        [AllowAnonymous]
         public IActionResult Index()
         {
             var items = _repository.GetAll();
             return View(items);
         }
 
-        /// <summary>
-        /// Displays details for a specific order item.
-        /// Supports both semantic (/order-items/{id}) and legacy (/OrderItem/Details/{id}) routes.
-        /// </summary>
         [Route("/order-items/{id:int}")]
         [Route("/OrderItem/Details/{id:int}")]
         [HttpGet]
@@ -49,14 +41,10 @@ namespace InventoryManagement.Controllers
             return View(item);
         }
 
-        /// <summary>
-        /// Displays the create form for a new order item.
-        /// Initializes CreatedAt to current date/time.
-        /// </summary>
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/order-items/create")]
         [Route("/OrderItem/Create")]
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new OrderItemFormModel
@@ -66,16 +54,11 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Processes creation of a new order item.
-        /// Maps form model to domain model and saves to database.
-        /// Redirects to Details on success.
-        /// </summary>
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/order-items/create")]
         [Route("/OrderItem/Create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(OrderItemFormModel model)
         {
             if (!ModelState.IsValid)
@@ -95,14 +78,10 @@ namespace InventoryManagement.Controllers
             };
 
             _repository.Add(orderItem);
-            return RedirectToAction("Details", new { id = orderItem.Id });
+            return RedirectToAction(nameof(Details), new { id = orderItem.Id });
         }
 
-        /// <summary>
-        /// Displays the edit form for an existing order item.
-        /// Populates display names from related Order and Product.
-        /// Returns NotFound if item doesn't exist.
-        /// </summary>
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/order-items/{id:int}/edit")]
         [Route("/OrderItem/Edit/{id:int}")]
         [HttpGet]
@@ -131,11 +110,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Processes updates to an existing order item.
-        /// Validates that ID in URL matches form model ID.
-        /// Redirects to Details on success.
-        /// </summary>
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/order-items/{id:int}/edit")]
         [Route("/OrderItem/Edit/{id:int}")]
         [HttpPost]
@@ -170,14 +145,10 @@ namespace InventoryManagement.Controllers
             };
 
             _repository.Update(orderItem);
-            return RedirectToAction("Details", new { id });
+            return RedirectToAction(nameof(Details), new { id });
         }
 
-        /// <summary>
-        /// Displays delete confirmation page for an order item.
-        /// Sets ViewBag.CanDelete to control button visibility.
-        /// Returns NotFound if item doesn't exist.
-        /// </summary>
+        [Authorize(Roles = "Admin")]
         [Route("/order-items/{id:int}/delete")]
         [Route("/OrderItem/Delete/{id:int}")]
         [HttpGet]
@@ -193,11 +164,7 @@ namespace InventoryManagement.Controllers
             return View(item);
         }
 
-        /// <summary>
-        /// Processes deletion of an order item.
-        /// Returns false if item has dependent records; redisplays delete view with error.
-        /// Redirects to Index on successful deletion.
-        /// </summary>
+        [Authorize(Roles = "Admin")]
         [Route("/order-items/{id:int}/delete")]
         [Route("/OrderItem/Delete/{id:int}")]
         [HttpPost]
@@ -213,14 +180,10 @@ namespace InventoryManagement.Controllers
                 return View("Delete", item);
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
-        /// <summary>
-        /// AJAX endpoint for searching order items.
-        /// Returns partial view with table rows matching the search term.
-        /// Supports searching by order number and product name.
-        /// </summary>
+        [AllowAnonymous]
         [Route("/order-items/search")]
         [HttpGet]
         public IActionResult Search(string? term)
