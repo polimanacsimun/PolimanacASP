@@ -16,8 +16,8 @@ namespace InventoryManagement.Controllers
             _repository = repository;
         }
 
-        [Route("/vendors")]
         [AllowAnonymous]
+        [Route("/vendors")]
         public IActionResult Index()
         {
             var suppliers = _repository.GetAll();
@@ -36,20 +36,20 @@ namespace InventoryManagement.Controllers
             return View(supplier);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/vendors/create")]
         [Route("Supplier/Create")]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new SupplierFormModel();
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/vendors/create")]
         [Route("Supplier/Create")]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(SupplierFormModel model)
         {
             if (!ModelState.IsValid)
@@ -72,6 +72,7 @@ namespace InventoryManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/vendors/{id:int}/edit")]
         [Route("Supplier/Edit/{id:int}")]
         public IActionResult Edit(int id)
@@ -97,6 +98,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/vendors/{id:int}/edit")]
@@ -131,6 +133,7 @@ namespace InventoryManagement.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("/vendors/{id:int}/delete")]
         [Route("Supplier/Delete/{id:int}")]
         public IActionResult Delete(int id)
@@ -145,6 +148,7 @@ namespace InventoryManagement.Controllers
             return View(supplier);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("Delete")]
@@ -169,6 +173,7 @@ namespace InventoryManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [Route("/vendors/search")]
         public IActionResult Search(string? term)
