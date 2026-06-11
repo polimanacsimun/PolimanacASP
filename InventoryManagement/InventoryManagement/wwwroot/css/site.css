@@ -213,38 +213,33 @@ body.app-body {
 }
 
 .dashboard-rgb-title {
-  color: #fff !important;
   display: inline-block;
   position: relative;
-  padding: .35rem .75rem;
-  border-radius: .9rem;
-  background: linear-gradient(90deg, #ffffff 0%, #dbeafe 18%, #c4b5fd 38%, #99f6e4 58%, #bfdbfe 78%, #ffffff 100%);
-  background-size: 320% 100%;
+  padding: 0;
+  border-radius: 0;
+  color: #ffffff !important;
+  background: linear-gradient(90deg, #ffffff 0%, #22d3ee 22%, #a78bfa 42%, #5eead4 62%, #60a5fa 82%, #ffffff 100%);
+  background-size: 420% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: rgbTitleShift 4.5s linear infinite;
+  animation: rgbTitleShift 12s ease-in-out infinite;
   text-shadow:
-    0 0 12px rgba(255, 255, 255, .72),
-    0 0 24px rgba(79, 70, 229, .48),
-    0 0 36px rgba(20, 184, 166, .42);
-  filter: drop-shadow(0 2px 6px rgba(15, 23, 42, .3));
+    0 0 3px rgba(255, 255, 255, .95),
+    0 0 10px rgba(255, 255, 255, .62),
+    0 0 18px rgba(34, 211, 238, .38),
+    0 0 28px rgba(167, 139, 250, .28);
+  filter: none;
 }
 
 .dashboard-rgb-title::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: .9rem;
-  background: rgba(15, 23, 42, .18);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, .15);
-  backdrop-filter: blur(5px);
+  display: none;
 }
 
 @keyframes rgbTitleShift {
   0% { background-position: 0% 50%; }
-  100% { background-position: 320% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .app-content-card {
@@ -252,6 +247,59 @@ body.app-body {
   border: 1px solid rgba(255, 255, 255, .72);
   box-shadow: 0 20px 55px rgba(15, 23, 42, .08) !important;
   backdrop-filter: blur(12px);
+}
+
+.dashboard-shell .hero > .d-flex {
+  align-items: center !important;
+  gap: 2rem;
+}
+
+.dashboard-shell .hero .breadcrumb {
+  display: none !important;
+}
+
+.dashboard-shell .hero .me-lg-4 {
+  max-width: 850px;
+}
+
+.dashboard-shell .hero h1 {
+  margin-bottom: .75rem !important;
+}
+
+.dashboard-shell .hero .lead {
+  max-width: 850px;
+  line-height: 1.55;
+}
+
+.dashboard-shell .hero .mini-note {
+  min-width: 235px;
+  padding: 1.35rem 1.45rem !important;
+  border-radius: 1.25rem !important;
+  background: rgba(255, 255, 255, .95) !important;
+  border: 1px solid rgba(255, 255, 255, .86) !important;
+  box-shadow: 0 22px 46px rgba(15, 23, 42, .18) !important;
+}
+
+.dashboard-shell .hero .mini-note .small:first-child {
+  color: #64748b !important;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 800;
+}
+
+.dashboard-shell .hero .mini-note .fw-semibold {
+  color: #059669 !important;
+  font-size: 1.55rem;
+  line-height: 1.1;
+  font-weight: 900 !important;
+  margin: .35rem 0 .45rem !important;
+}
+
+.dashboard-shell .hero .mini-note .small:last-child {
+  color: #475569 !important;
+  font-size: .96rem;
+  line-height: 1.35;
 }
 
 .login-card {
@@ -445,6 +493,10 @@ a[href*="/delete"]:hover {
 
   .user-nav {
     padding-top: .75rem;
+    align-items: flex-start !important;
+  }
+
+  .dashboard-shell .hero > .d-flex {
     align-items: flex-start !important;
   }
 }
