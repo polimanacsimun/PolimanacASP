@@ -1,5 +1,6 @@
-using InventoryManagement.Models;
 using InventoryManagement.DAL.Repositories;
+using InventoryManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Linq;

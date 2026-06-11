@@ -1,10 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using InventoryManagement.DAL.Repositories;
 using InventoryManagement.Domain.Models;
 using InventoryManagement.ViewModels.OrderItem;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Controllers
 {
+    [Authorize]
     public class OrderItemController : Controller
     {
         private readonly OrderItemEfRepository _repository;
@@ -22,6 +24,7 @@ namespace InventoryManagement.Controllers
         [Route("/OrderItem")]
         [Route("/OrderItem/Index")]
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var items = _repository.GetAll();
@@ -53,6 +56,7 @@ namespace InventoryManagement.Controllers
         [Route("/order-items/create")]
         [Route("/OrderItem/Create")]
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new OrderItemFormModel
@@ -71,6 +75,7 @@ namespace InventoryManagement.Controllers
         [Route("/OrderItem/Create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(OrderItemFormModel model)
         {
             if (!ModelState.IsValid)

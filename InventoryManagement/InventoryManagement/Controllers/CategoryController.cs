@@ -1,10 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using InventoryManagement.DAL.Repositories;
-using InventoryManagement.ViewModels.Category;
 using InventoryManagement.Domain.Models;
+using InventoryManagement.ViewModels.Category;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Controllers
 {
+    [Authorize]
     public class CategoryController : Controller
     {
         private readonly CategoryEfRepository _repository;
@@ -15,6 +17,7 @@ namespace InventoryManagement.Controllers
         }
 
         [Route("/categories")]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var categories = _repository.GetAll();
@@ -35,6 +38,7 @@ namespace InventoryManagement.Controllers
 
         [Route("/categories/create")]
         [Route("Category/Create")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new CategoryFormModel();
@@ -45,6 +49,7 @@ namespace InventoryManagement.Controllers
         [ValidateAntiForgeryToken]
         [Route("/categories/create")]
         [Route("Category/Create")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(CategoryFormModel model)
         {
             if (!ModelState.IsValid)

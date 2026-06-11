@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using InventoryManagement.DAL.Repositories;
 using InventoryManagement.Domain.Models;
 using InventoryManagement.ViewModels.User;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryManagement.Controllers
 {
@@ -17,6 +18,7 @@ namespace InventoryManagement.Controllers
         [Route("users")]
         [Route("User")]
         [Route("User/Index")]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var users = _repository.GetAll();
@@ -39,6 +41,7 @@ namespace InventoryManagement.Controllers
         [Route("users/create")]
         [Route("User/Create")]
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new UserFormModel
@@ -53,6 +56,7 @@ namespace InventoryManagement.Controllers
         [Route("User/Create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(UserFormModel model)
         {
             if (!ModelState.IsValid)

@@ -1,10 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using InventoryManagement.DAL.Repositories;
-using InventoryManagement.ViewModels.Product;
 using InventoryManagement.Domain.Models;
+using InventoryManagement.ViewModels.Product;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Controllers
 {
+    [Authorize]
     public class ProductController : Controller
     {
         private readonly ProductEfRepository _repository;
@@ -17,6 +19,7 @@ public ProductController(ProductEfRepository repository)
         [Route("catalog", Name = "ProductCatalog")]
         [Route("Product")]
         [Route("Product/Index")]        
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var products = _repository.GetAll();
@@ -39,6 +42,7 @@ public ProductController(ProductEfRepository repository)
 
         [Route("catalog/create")]
         [Route("Product/Create")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new ProductFormModel
@@ -53,6 +57,7 @@ public ProductController(ProductEfRepository repository)
         [ValidateAntiForgeryToken]
         [Route("catalog/create")]
         [Route("Product/Create")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(ProductFormModel model)
         {
             if (!ModelState.IsValid)

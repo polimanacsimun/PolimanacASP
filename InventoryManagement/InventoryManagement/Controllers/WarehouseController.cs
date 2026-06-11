@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using InventoryManagement.DAL.Repositories;
 using InventoryManagement.Domain.Models;
 using InventoryManagement.ViewModels.Warehouse;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryManagement.Controllers
 {
@@ -15,6 +16,7 @@ namespace InventoryManagement.Controllers
         }
 
         [Route("/storage")]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var warehouses = _repository.GetAll();
@@ -35,6 +37,7 @@ namespace InventoryManagement.Controllers
 
         [Route("/storage/create")]
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new WarehouseFormModel
@@ -48,6 +51,7 @@ namespace InventoryManagement.Controllers
         [Route("/storage/create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(WarehouseFormModel model)
         {
             if (!ModelState.IsValid)

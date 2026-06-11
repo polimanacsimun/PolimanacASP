@@ -1,10 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using InventoryManagement.DAL.Repositories;
-using InventoryManagement.ViewModels.Supplier;
 using InventoryManagement.Domain.Models;
+using InventoryManagement.ViewModels.Supplier;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Controllers
 {
+    [Authorize]
     public class SupplierController : Controller
     {
         private readonly SupplierEfRepository _repository;
@@ -15,6 +17,7 @@ namespace InventoryManagement.Controllers
         }
 
         [Route("/vendors")]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var suppliers = _repository.GetAll();
@@ -35,6 +38,7 @@ namespace InventoryManagement.Controllers
 
         [Route("/vendors/create")]
         [Route("Supplier/Create")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new SupplierFormModel();
@@ -45,6 +49,7 @@ namespace InventoryManagement.Controllers
         [ValidateAntiForgeryToken]
         [Route("/vendors/create")]
         [Route("Supplier/Create")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(SupplierFormModel model)
         {
             if (!ModelState.IsValid)
