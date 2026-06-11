@@ -13,9 +13,9 @@ html {
   --app-purple: #4f46e5;
   --app-teal: #14b8a6;
   --app-cyan: #06b6d4;
-  --app-soft-blue: #eef5ff;
-  --app-soft-purple: #f5f3ff;
-  --app-soft-teal: #ecfdf5;
+  --app-soft-blue: #dfeaff;
+  --app-soft-purple: #efe9ff;
+  --app-soft-teal: #ddfbf3;
   --app-border: rgba(100, 116, 139, .18);
   --app-text: #162033;
   --app-muted: #64748b;
@@ -38,9 +38,10 @@ body.app-body {
   margin-bottom: 0;
   color: var(--app-text);
   background:
-    radial-gradient(circle at top left, rgba(79, 70, 229, .16), transparent 34rem),
-    radial-gradient(circle at top right, rgba(20, 184, 166, .16), transparent 32rem),
-    linear-gradient(135deg, #f2f7ff 0%, #f7f4ff 48%, #ecfdf5 100%);
+    radial-gradient(circle at 8% 14%, rgba(79, 70, 229, .34), transparent 30rem),
+    radial-gradient(circle at 92% 8%, rgba(20, 184, 166, .34), transparent 34rem),
+    radial-gradient(circle at 72% 88%, rgba(13, 110, 253, .18), transparent 34rem),
+    linear-gradient(135deg, #dfe8ff 0%, #eee9ff 45%, #d9fbf2 100%);
   background-attachment: fixed;
 }
 
@@ -56,7 +57,7 @@ body.app-body {
 }
 
 .site-header {
-  background: rgba(255, 255, 255, .86);
+  background: rgba(255, 255, 255, .88);
   border-bottom: 1px solid var(--app-border);
   backdrop-filter: blur(14px);
   box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
@@ -142,6 +143,14 @@ body.app-body {
   max-width: 1320px;
 }
 
+.app-auth-container {
+  max-width: 1280px;
+}
+
+.auth-stage {
+  min-height: calc(100vh - 190px);
+}
+
 .app-page-heading {
   padding: .2rem .1rem;
 }
@@ -153,10 +162,33 @@ body.app-body {
 }
 
 .app-content-card {
-  background: rgba(255, 255, 255, .82);
-  border: 1px solid rgba(255, 255, 255, .8);
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid rgba(255, 255, 255, .72);
   box-shadow: 0 20px 55px rgba(15, 23, 42, .08) !important;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+}
+
+.login-card {
+  transform: translateY(-.5rem);
+  box-shadow: 0 30px 80px rgba(15, 23, 42, .18) !important;
+}
+
+.login-card-hero {
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, .24), transparent 14rem),
+    linear-gradient(135deg, #0d6efd 0%, #4f46e5 52%, #14b8a6 100%);
+}
+
+.login-brand-mark {
+  width: 68px !important;
+  height: 68px !important;
+  box-shadow: none !important;
+  background: rgba(255, 255, 255, .16) !important;
+  border: 1px solid rgba(255, 255, 255, .22);
+}
+
+.login-card .form-control-lg {
+  min-height: 54px;
 }
 
 .card,
@@ -189,6 +221,53 @@ body.app-body {
 
 .table tbody tr:hover {
   background: #f8fbff;
+}
+
+.table td .btn-group,
+.table td .btn-group-sm {
+  display: inline-flex;
+  gap: .45rem;
+  align-items: center;
+}
+
+.table td .btn-group > .btn,
+.table td .btn-group-sm > .btn,
+.table td a.btn[href*="/Details"],
+.table td a.btn[href*="/details"],
+.table td a.btn[href*="/summary"],
+.table td a.btn[href*="/Edit"],
+.table td a.btn[href*="/edit"],
+.table td a.btn[href*="/Delete"],
+.table td a.btn[href*="/delete"] {
+  border-radius: .65rem !important;
+  min-width: 86px;
+  padding: .45rem .75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  font-weight: 600;
+  line-height: 1.1;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, .08);
+}
+
+.table td .btn-group > .btn:not(:first-child),
+.table td .btn-group-sm > .btn:not(:first-child) {
+  margin-left: 0;
+}
+
+.table td .btn-group a[href*="/edit"]::after,
+.table td .btn-group-sm a[href*="/edit"]::after,
+.table td .btn-group a[href*="/Edit"]::after,
+.table td .btn-group-sm a[href*="/Edit"]::after {
+  content: "Edit";
+}
+
+.table td .btn-group a[href*="/delete"]::after,
+.table td .btn-group-sm a[href*="/delete"]::after,
+.table td .btn-group a[href*="/Delete"]::after,
+.table td .btn-group-sm a[href*="/Delete"]::after {
+  content: "Delete";
 }
 
 footer.site-footer {
@@ -263,5 +342,9 @@ a[href*="/delete"]:hover {
 
   .app-nav-list .nav-link {
     display: inline-flex;
+  }
+
+  .auth-stage {
+    min-height: auto;
   }
 }
