@@ -1,9 +1,7 @@
 using InventoryManagement.DAL.Repositories;
 using InventoryManagement.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Linq;
 
 namespace InventoryManagement.Controllers
 {
@@ -11,7 +9,7 @@ namespace InventoryManagement.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ProductEfRepository _productRepository;
-         private readonly SupplierEfRepository _supplierRepository;
+        private readonly SupplierEfRepository _supplierRepository;
         private readonly WarehouseEfRepository _warehouseRepository;
         private readonly UserEfRepository _userRepository;
         private readonly OrderEfRepository _orderRepository;
@@ -37,50 +35,55 @@ namespace InventoryManagement.Controllers
         [Route("Home")]
         [Route("Home/Index")]
         public IActionResult Index()
-{
-    try
-    {
-        var allProducts = _productRepository.GetAll();
-        var allSuppliers = _supplierRepository.GetAll();
-        var allWarehouses = _warehouseRepository.GetAll();
-        var allUsers = _userRepository.GetAll();
-        var allOrders = _orderRepository.GetAll();
+        {
+            if (!(User.Identity?.IsAuthenticated ?? false))
+            {
+                return RedirectToAction("Login", "Account");
+            }
 
-        int totalProducts = allProducts?.Count ?? 0;
-        int activeSuppliers = allSuppliers?.Count(s => s.IsActive) ?? 0;
-        int warehouseCapacity = allWarehouses?.Sum(w => w.Capacity) ?? 0;
-        int totalUsers = allUsers?.Count ?? 0;
-        int totalOrders = allOrders?.Count ?? 0;
-        int warehouseCount = allWarehouses?.Count ?? 0;
+            try
+            {
+                var allProducts = _productRepository.GetAll();
+                var allSuppliers = _supplierRepository.GetAll();
+                var allWarehouses = _warehouseRepository.GetAll();
+                var allUsers = _userRepository.GetAll();
+                var allOrders = _orderRepository.GetAll();
 
-        ViewBag.TotalProducts = totalProducts;
-        ViewBag.ActiveSuppliers = activeSuppliers;
-        ViewBag.WarehouseCapacity = warehouseCapacity;
-        ViewBag.TotalUsers = totalUsers;
-        ViewBag.RecentOrders = totalOrders;
+                int totalProducts = allProducts?.Count ?? 0;
+                int activeSuppliers = allSuppliers?.Count(s => s.IsActive) ?? 0;
+                int warehouseCapacity = allWarehouses?.Sum(w => w.Capacity) ?? 0;
+                int totalUsers = allUsers?.Count ?? 0;
+                int totalOrders = allOrders?.Count ?? 0;
+                int warehouseCount = allWarehouses?.Count ?? 0;
 
-        _logger.LogInformation(
-            "Dashboard loaded successfully with {ProductCount} products, {SupplierCount} suppliers, {WarehouseCount} warehouses, {UserCount} users, and {OrderCount} orders.",
-            totalProducts,
-            activeSuppliers,
-            warehouseCount,
-            totalUsers,
-            totalOrders
-        );
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error loading dashboard metrics.");
+                ViewBag.TotalProducts = totalProducts;
+                ViewBag.ActiveSuppliers = activeSuppliers;
+                ViewBag.WarehouseCapacity = warehouseCapacity;
+                ViewBag.TotalUsers = totalUsers;
+                ViewBag.RecentOrders = totalOrders;
 
-        ViewBag.TotalProducts = 0;
-        ViewBag.ActiveSuppliers = 0;
-        ViewBag.WarehouseCapacity = 0;
-        ViewBag.TotalUsers = 0;
-        ViewBag.RecentOrders = 0;
-    }
+                _logger.LogInformation(
+                    "Dashboard loaded successfully with {ProductCount} products, {SupplierCount} suppliers, {WarehouseCount} warehouses, {UserCount} users, and {OrderCount} orders.",
+                    totalProducts,
+                    activeSuppliers,
+                    warehouseCount,
+                    totalUsers,
+                    totalOrders
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading dashboard metrics.");
 
-    return View();
-}
+                ViewBag.TotalProducts = 0;
+                ViewBag.ActiveSuppliers = 0;
+                ViewBag.WarehouseCapacity = 0;
+                ViewBag.TotalUsers = 0;
+                ViewBag.RecentOrders = 0;
+            }
+
+            return View();
+        }
 
         public IActionResult Privacy()
         {
