@@ -42,6 +42,10 @@
         pageTitle = $"Dashboard - Hello, {dashboardDisplayName}";
     }
 
+    var pageTitleClass = isDashboard
+        ? "h5 mb-0 dashboard-rgb-title"
+        : "h5 mb-0";
+
     Func<string, string> active = controller =>
         string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase)
             ? "active"
@@ -139,7 +143,7 @@
         {
             <div class="container app-page-container">
                 <div class="app-page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
-                    <h2 class="h5 mb-0">@pageTitle</h2>
+                    <h2 class="@pageTitleClass">@pageTitle</h2>
                     <div class="text-muted small">
                         <span class="me-2">Status: <strong class="text-success">Operational</strong></span>
                         <span class="d-none d-md-inline">| Last updated: @DateTime.Now.ToString("yyyy-MM-dd")</span>
@@ -163,9 +167,9 @@
     @if (TempData["ToastMessage"] != null)
     {
         <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
-            <div id="appToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="appToast" class="toast app-toast align-items-center border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
-                    <div class="toast-body">
+                    <div class="toast-body fw-semibold">
                         @TempData["ToastMessage"]
                     </div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
