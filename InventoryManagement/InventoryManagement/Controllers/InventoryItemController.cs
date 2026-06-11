@@ -16,25 +16,17 @@ namespace InventoryManagement.Controllers
             _repository = repository;
         }
 
-        /// <summary>
-        /// Displays list of all inventory items.
-        /// Supports both semantic (/inventory) and legacy (/InventoryItem) routes.
-        /// </summary>
+        [AllowAnonymous]
         [Route("/inventory")]
         [Route("/InventoryItem")]
         [Route("/InventoryItem/Index")]
         [HttpGet]
-        [AllowAnonymous]
         public IActionResult Index()
         {
             var items = _repository.GetAll();
             return View(items);
         }
 
-        /// <summary>
-        /// Displays details for a specific inventory item.
-        /// Supports both semantic (/inventory/{id}) and legacy (/InventoryItem/Details/{id}) routes.
-        /// </summary>
         [Route("/inventory/{id:int}")]
         [Route("/InventoryItem/Details/{id:int}")]
         [HttpGet]
@@ -49,14 +41,10 @@ namespace InventoryManagement.Controllers
             return View(item);
         }
 
-        /// <summary>
-        /// Displays the create form for a new inventory item.
-        /// Initializes LastCheckedAt to current date/time.
-        /// </summary>
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/inventory/create")]
         [Route("/InventoryItem/Create")]
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new InventoryItemFormModel
@@ -66,16 +54,11 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Processes creation of a new inventory item.
-        /// Maps form model to domain model and saves to database.
-        /// Redirects to Details on success.
-        /// </summary>
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/inventory/create")]
         [Route("/InventoryItem/Create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(InventoryItemFormModel model)
         {
             if (!ModelState.IsValid)
@@ -95,14 +78,10 @@ namespace InventoryManagement.Controllers
             };
 
             _repository.Add(inventoryItem);
-            return RedirectToAction("Details", new { id = inventoryItem.Id });
+            return RedirectToAction(nameof(Details), new { id = inventoryItem.Id });
         }
 
-        /// <summary>
-        /// Displays the edit form for an existing inventory item.
-        /// Populates display names from related Product and Warehouse.
-        /// Returns NotFound if item doesn't exist.
-        /// </summary>
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/inventory/{id:int}/edit")]
         [Route("/InventoryItem/Edit/{id:int}")]
         [HttpGet]
@@ -131,11 +110,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Processes updates to an existing inventory item.
-        /// Validates that ID in URL matches form model ID.
-        /// Redirects to Details on success.
-        /// </summary>
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/inventory/{id:int}/edit")]
         [Route("/InventoryItem/Edit/{id:int}")]
         [HttpPost]
@@ -170,14 +145,10 @@ namespace InventoryManagement.Controllers
             };
 
             _repository.Update(inventoryItem);
-            return RedirectToAction("Details", new { id });
+            return RedirectToAction(nameof(Details), new { id });
         }
 
-        /// <summary>
-        /// Displays delete confirmation page for an inventory item.
-        /// Sets ViewBag.CanDelete to control button visibility.
-        /// Returns NotFound if item doesn't exist.
-        /// </summary>
+        [Authorize(Roles = "Admin")]
         [Route("/inventory/{id:int}/delete")]
         [Route("/InventoryItem/Delete/{id:int}")]
         [HttpGet]
@@ -193,11 +164,7 @@ namespace InventoryManagement.Controllers
             return View(item);
         }
 
-        /// <summary>
-        /// Processes deletion of an inventory item.
-        /// Returns false if item has dependent records; redisplays delete view with error.
-        /// Redirects to Index on successful deletion.
-        /// </summary>
+        [Authorize(Roles = "Admin")]
         [Route("/inventory/{id:int}/delete")]
         [Route("/InventoryItem/Delete/{id:int}")]
         [HttpPost]
@@ -213,14 +180,10 @@ namespace InventoryManagement.Controllers
                 return View("Delete", item);
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
-        /// <summary>
-        /// AJAX endpoint for searching inventory items.
-        /// Returns partial view with table rows matching the search term.
-        /// Supports searching by Product name, Warehouse name, and Shelf location.
-        /// </summary>
+        [AllowAnonymous]
         [Route("/inventory/search")]
         [HttpGet]
         public IActionResult Search(string? term)
