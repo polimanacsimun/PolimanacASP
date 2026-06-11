@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -29,11 +29,13 @@ namespace InventoryManagement.Domain.Models
 
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
         public virtual ICollection<InventoryItem> InventoryItems { get; set; } = new HashSet<InventoryItem>();
+        public virtual ICollection<ProductAttachment> Attachments { get; set; } = new HashSet<ProductAttachment>();
 
         public Product()
         {
             OrderItems = new HashSet<OrderItem>();
             InventoryItems = new HashSet<InventoryItem>();
+            Attachments = new HashSet<ProductAttachment>();
         }
     }
 }
