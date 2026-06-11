@@ -17,8 +17,10 @@ namespace InventoryManagement.Controllers
             _repository = repository;
         }
 
-        [Route("/orders/history")]
         [AllowAnonymous]
+        [Route("/orders/history")]
+        [Route("/Order")]
+        [Route("/Order/Index")]
         public IActionResult Index()
         {
             var orders = _repository.GetAll();
@@ -26,6 +28,7 @@ namespace InventoryManagement.Controllers
         }
 
         [Route("/orders/{id:int}/summary")]
+        [Route("/Order/Details/{id:int}")]
         public IActionResult Details(int id)
         {
             var order = _repository.GetById(id);
@@ -37,9 +40,10 @@ namespace InventoryManagement.Controllers
             return View(order);
         }
 
-        [Route("/orders/create")]
-        [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
+        [Route("/orders/create")]
+        [Route("/Order/Create")]
+        [HttpGet]
         public IActionResult Create()
         {
             var model = new OrderFormModel
@@ -50,10 +54,11 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/orders/create")]
+        [Route("/Order/Create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(OrderFormModel model)
         {
             if (!ModelState.IsValid)
@@ -73,10 +78,12 @@ namespace InventoryManagement.Controllers
             };
 
             _repository.Add(order);
-            return RedirectToRoute(new { controller = "Order", action = "Details", id = order.Id });
+            return RedirectToAction(nameof(Details), new { id = order.Id });
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/orders/{id:int}/edit")]
+        [Route("/Order/Edit/{id:int}")]
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -96,15 +103,17 @@ namespace InventoryManagement.Controllers
                 DeliveryDate = order.DeliveryDate,
                 Note = order.Note,
                 UserId = order.UserId,
-                UserDisplayName = order.User != null 
-                    ? $"{order.User.FirstName} {order.User.LastName} ({order.User.Email})" 
+                UserDisplayName = order.User != null
+                    ? $"{order.User.FirstName} {order.User.LastName} ({order.User.Email})"
                     : null
             };
 
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/orders/{id:int}/edit")]
+        [Route("/Order/Edit/{id:int}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, OrderFormModel model)
@@ -134,10 +143,12 @@ namespace InventoryManagement.Controllers
             order.UserId = model.UserId.Value;
 
             _repository.Update(order);
-            return RedirectToRoute(new { controller = "Order", action = "Details", id = order.Id });
+            return RedirectToAction(nameof(Details), new { id = order.Id });
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("/orders/{id:int}/delete")]
+        [Route("/Order/Delete/{id:int}")]
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -151,7 +162,9 @@ namespace InventoryManagement.Controllers
             return View(order);
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("/orders/{id:int}/delete")]
+        [Route("/Order/Delete/{id:int}")]
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -170,47 +183,16 @@ namespace InventoryManagement.Controllers
                 return View("Delete", order);
             }
 
-            return RedirectToRoute(new { controller = "Order", action = "Index" });
+            return RedirectToAction(nameof(Index));
         }
 
+        [AllowAnonymous]
         [Route("/orders/search")]
         [HttpGet]
         public IActionResult Search(string? term)
         {
             var orders = _repository.Search(term);
             return PartialView("_OrderTableRows", orders);
-        }
-
-        // Legacy routes for backward compatibility
-        [Route("/Order")]
-        [Route("/Order/Index")]
-        public IActionResult LegacyIndex()
-        {
-            return RedirectToRoute(new { controller = "Order", action = "Index" });
-        }
-
-        [Route("/Order/Details/{id:int}")]
-        public IActionResult LegacyDetails(int id)
-        {
-            return RedirectToRoute(new { controller = "Order", action = "Details", id });
-        }
-
-        [Route("/Order/Create")]
-        public IActionResult LegacyCreate()
-        {
-            return RedirectToRoute(new { controller = "Order", action = "Create" });
-        }
-
-        [Route("/Order/Edit/{id:int}")]
-        public IActionResult LegacyEdit(int id)
-        {
-            return RedirectToRoute(new { controller = "Order", action = "Edit", id });
-        }
-
-        [Route("/Order/Delete/{id:int}")]
-        public IActionResult LegacyDelete(int id)
-        {
-            return RedirectToRoute(new { controller = "Order", action = "Delete", id });
         }
     }
 }
