@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using InventoryManagement.Domain.Enums;
 
 namespace InventoryManagement.DTOs;
@@ -44,6 +44,17 @@ public class ProductLookupDto
     public string UnitOfMeasure { get; set; } = string.Empty;
 }
 
+public class ProductAttachmentDto
+{
+    public int Id { get; set; }
+    public int ProductId { get; set; }
+    public string FileName { get; set; } = string.Empty;
+    public string FilePath { get; set; } = string.Empty;
+    public string ContentType { get; set; } = string.Empty;
+    public long FileSize { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+
 public class ProductDto
 {
     public int Id { get; set; }
@@ -61,6 +72,8 @@ public class ProductDto
 
     public int? SupplierId { get; set; }
     public SupplierDto? Supplier { get; set; }
+
+    public List<ProductAttachmentDto> Attachments { get; set; } = new();
 }
 
 public class InventoryItemDto

@@ -1,4 +1,4 @@
-﻿using InventoryManagement.Domain.Models;
+using InventoryManagement.Domain.Models;
 
 namespace InventoryManagement.DTOs;
 
@@ -57,6 +57,20 @@ public static class MappingExtensions
         };
     }
 
+    public static ProductAttachmentDto ToDto(this ProductAttachment attachment)
+    {
+        return new ProductAttachmentDto
+        {
+            Id = attachment.Id,
+            ProductId = attachment.ProductId,
+            FileName = attachment.FileName ?? string.Empty,
+            FilePath = attachment.FilePath ?? string.Empty,
+            ContentType = attachment.ContentType ?? string.Empty,
+            FileSize = attachment.FileSize,
+            CreatedAt = attachment.CreatedAt
+        };
+    }
+
     public static ProductDto ToDto(this Product product)
     {
         return new ProductDto
@@ -73,7 +87,10 @@ public static class MappingExtensions
             CategoryId = product.CategoryId,
             SupplierId = product.SupplierId,
             Category = product.Category?.ToDto(),
-            Supplier = product.Supplier?.ToDto()
+            Supplier = product.Supplier?.ToDto(),
+            Attachments = product.Attachments?
+                .Select(attachment => attachment.ToDto())
+                .ToList() ?? new List<ProductAttachmentDto>()
         };
     }
 
@@ -120,9 +137,6 @@ public static class MappingExtensions
             CreatedAt = item.CreatedAt,
             OrderId = item.OrderId,
             ProductId = item.ProductId,
-
-            // Važno: ime proizvoda se dobiva preko item.Product?.Name,
-            // a ne preko nepostojećeg item.ProductName.
             Product = item.Product?.ToLookupDto()
         };
     }

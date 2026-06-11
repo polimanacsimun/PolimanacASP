@@ -1,11 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using InventoryManagement.DAL.Repositories;
 using InventoryManagement.Domain.Models;
 using InventoryManagement.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         private readonly UserEfRepository _repository;
@@ -15,10 +16,10 @@ namespace InventoryManagement.Controllers
             _repository = repository;
         }
 
+        [AllowAnonymous]
         [Route("users")]
         [Route("User")]
         [Route("User/Index")]
-        [AllowAnonymous]
         public IActionResult Index()
         {
             var users = _repository.GetAll();
@@ -38,10 +39,10 @@ namespace InventoryManagement.Controllers
             return View(user);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("users/create")]
         [Route("User/Create")]
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new UserFormModel
@@ -52,11 +53,11 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("users/create")]
         [Route("User/Create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(UserFormModel model)
         {
             if (!ModelState.IsValid)
@@ -75,9 +76,10 @@ namespace InventoryManagement.Controllers
             };
 
             _repository.Add(user);
-            return RedirectToRoute(new { controller = "User", action = "Details", id = user.Id });
+            return RedirectToAction(nameof(Details), new { id = user.Id });
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("users/{id:int}/edit")]
         [Route("User/Edit/{id:int}")]
         [HttpGet]
@@ -103,6 +105,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("users/{id:int}/edit")]
         [Route("User/Edit/{id:int}")]
         [HttpPost]
@@ -133,9 +136,10 @@ namespace InventoryManagement.Controllers
             user.IsActive = model.IsActive;
 
             _repository.Update(user);
-            return RedirectToRoute(new { controller = "User", action = "Details", id = user.Id });
+            return RedirectToAction(nameof(Details), new { id = user.Id });
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("users/{id:int}/delete")]
         [Route("User/Delete/{id:int}")]
         [HttpGet]
@@ -151,6 +155,7 @@ namespace InventoryManagement.Controllers
             return View(user);
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("users/{id:int}/delete")]
         [Route("User/Delete/{id:int}")]
         [HttpPost]
@@ -171,9 +176,10 @@ namespace InventoryManagement.Controllers
                 return View("Delete", user);
             }
 
-            return RedirectToRoute(new { controller = "User", action = "Index" });
+            return RedirectToAction(nameof(Index));
         }
 
+        [AllowAnonymous]
         [Route("users/search")]
         [HttpGet]
         public IActionResult Search(string? term)

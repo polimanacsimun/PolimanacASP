@@ -1,11 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using InventoryManagement.DAL.Repositories;
 using InventoryManagement.Domain.Models;
 using InventoryManagement.ViewModels.Warehouse;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Controllers
 {
+    [Authorize]
     public class WarehouseController : Controller
     {
         private readonly WarehouseEfRepository _repository;
@@ -15,8 +16,10 @@ namespace InventoryManagement.Controllers
             _repository = repository;
         }
 
-        [Route("/storage")]
         [AllowAnonymous]
+        [Route("/storage")]
+        [Route("/Warehouse")]
+        [Route("/Warehouse/Index")]
         public IActionResult Index()
         {
             var warehouses = _repository.GetAll();
@@ -24,6 +27,7 @@ namespace InventoryManagement.Controllers
         }
 
         [Route("/storage/{id:int}")]
+        [Route("/Warehouse/Details/{id:int}")]
         public IActionResult Details(int id)
         {
             var warehouse = _repository.GetById(id);
@@ -35,9 +39,10 @@ namespace InventoryManagement.Controllers
             return View(warehouse);
         }
 
-        [Route("/storage/create")]
-        [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
+        [Route("/storage/create")]
+        [Route("/Warehouse/Create")]
+        [HttpGet]
         public IActionResult Create()
         {
             var model = new WarehouseFormModel
@@ -48,10 +53,11 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/storage/create")]
+        [Route("/Warehouse/Create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create(WarehouseFormModel model)
         {
             if (!ModelState.IsValid)
@@ -73,10 +79,12 @@ namespace InventoryManagement.Controllers
             };
 
             _repository.Add(warehouse);
-            return RedirectToRoute(new { controller = "Warehouse", action = "Details", id = warehouse.Id });
+            return RedirectToAction(nameof(Details), new { id = warehouse.Id });
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/storage/{id:int}/edit")]
+        [Route("/Warehouse/Edit/{id:int}")]
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -103,7 +111,9 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("/storage/{id:int}/edit")]
+        [Route("/Warehouse/Edit/{id:int}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, WarehouseFormModel model)
@@ -135,10 +145,12 @@ namespace InventoryManagement.Controllers
             warehouse.Type = model.Type;
 
             _repository.Update(warehouse);
-            return RedirectToRoute(new { controller = "Warehouse", action = "Details", id = warehouse.Id });
+            return RedirectToAction(nameof(Details), new { id = warehouse.Id });
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("/storage/{id:int}/delete")]
+        [Route("/Warehouse/Delete/{id:int}")]
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -152,7 +164,9 @@ namespace InventoryManagement.Controllers
             return View(warehouse);
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("/storage/{id:int}/delete")]
+        [Route("/Warehouse/Delete/{id:int}")]
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -171,47 +185,16 @@ namespace InventoryManagement.Controllers
                 return View("Delete", warehouse);
             }
 
-            return RedirectToRoute(new { controller = "Warehouse", action = "Index" });
+            return RedirectToAction(nameof(Index));
         }
 
+        [AllowAnonymous]
         [Route("/storage/search")]
         [HttpGet]
         public IActionResult Search(string? term)
         {
             var warehouses = _repository.Search(term);
             return PartialView("_WarehouseTableRows", warehouses);
-        }
-
-        // Legacy routes for backward compatibility
-        [Route("/Warehouse")]
-        [Route("/Warehouse/Index")]
-        public IActionResult LegacyIndex()
-        {
-            return RedirectToRoute(new { controller = "Warehouse", action = "Index" });
-        }
-
-        [Route("/Warehouse/Details/{id:int}")]
-        public IActionResult LegacyDetails(int id)
-        {
-            return RedirectToRoute(new { controller = "Warehouse", action = "Details", id });
-        }
-
-        [Route("/Warehouse/Create")]
-        public IActionResult LegacyCreate()
-        {
-            return RedirectToRoute(new { controller = "Warehouse", action = "Create" });
-        }
-
-        [Route("/Warehouse/Edit/{id:int}")]
-        public IActionResult LegacyEdit(int id)
-        {
-            return RedirectToRoute(new { controller = "Warehouse", action = "Edit", id });
-        }
-
-        [Route("/Warehouse/Delete/{id:int}")]
-        public IActionResult LegacyDelete(int id)
-        {
-            return RedirectToRoute(new { controller = "Warehouse", action = "Delete", id });
         }
     }
 }

@@ -23,24 +23,20 @@
                     <form method="post" class="needs-validation" novalidate>
                         @Html.AntiForgeryToken()
 
-                        <!-- Hidden ID -->
                         <input asp-for="Id" type="hidden" />
 
-                        <!-- Product Name -->
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label fw-semibold">Product Name</label>
                             <input asp-for="Name" class="form-control" placeholder="Enter product name" />
                             <span asp-validation-for="Name" class="invalid-feedback d-block"></span>
                         </div>
 
-                        <!-- Description -->
                         <div class="mb-3">
                             <label asp-for="Description" class="form-label fw-semibold">Description</label>
                             <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter product description"></textarea>
                             <span asp-validation-for="Description" class="invalid-feedback d-block"></span>
                         </div>
 
-                        <!-- Price -->
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -53,7 +49,6 @@
                                 </div>
                             </div>
 
-                            <!-- Unit of Measure -->
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label asp-for="UnitOfMeasure" class="form-label fw-semibold">Unit of Measure</label>
@@ -63,7 +58,6 @@
                             </div>
                         </div>
 
-                        <!-- Minimum Stock -->
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -73,7 +67,6 @@
                                 </div>
                             </div>
 
-                            <!-- Type -->
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label asp-for="Type" class="form-label fw-semibold">Product Type</label>
@@ -85,7 +78,6 @@
                             </div>
                         </div>
 
-                        <!-- Category & Supplier Autocomplete -->
                         <div class="row">
                             <div class="col-md-6">
                                 @await Html.PartialAsync("_AutocompleteDropdown", new AutocompleteDropdownModel
@@ -130,7 +122,6 @@
                             IsRequired = true
                         })
 
-                        <!-- Is Active -->
                         <div class="mb-4">
                             <div class="form-check">
                                 <input asp-for="IsActive" class="form-check-input" type="checkbox" id="IsActive" />
@@ -140,7 +131,6 @@
                             </div>
                         </div>
 
-                        <!-- Form Actions -->
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-info btn-lg text-white">
                                 <i class="bi bi-check-circle"></i> Save Changes
@@ -152,6 +142,30 @@
                     </form>
                 </div>
             </div>
+
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0">Product attachments</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form id="productAttachmentUploadForm" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label for="productAttachmentFiles" class="form-label fw-semibold">Upload files</label>
+                            <input id="productAttachmentFiles" name="files" type="file" class="form-control" multiple />
+                            <div class="form-text">Allowed: PDF, images, TXT, Word and Excel files. Maximum size: 10 MB per file.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                        <span id="productAttachmentMessage" class="ms-3"></span>
+                    </form>
+
+                    <hr />
+
+                    <div id="productAttachmentsContainer">
+                        <div class="text-muted">Loading attachments...</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -160,4 +174,98 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const productId = @Model.Id;
+            const listUrl = `/products/${productId}/attachments`;
+            const uploadUrl = `/products/${productId}/attachments/upload`;
+            const form = document.getElementById('productAttachmentUploadForm');
+            const filesInput = document.getElementById('productAttachmentFiles');
+            const container = document.getElementById('productAttachmentsContainer');
+            const message = document.getElementById('productAttachmentMessage');
+
+            async function loadAttachments() {
+                const response = await fetch(listUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                container.innerHTML = await response.text();
+            }
+
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                message.textContent = '';
+                message.className = 'ms-3';
+
+                if (!filesInput.files.length) {
+                    message.textContent = 'Choose at least one file.';
+                    message.classList.add('text-danger');
+                    return;
+                }
+
+                const formData = new FormData(form);
+
+                const response = await fetch(uploadUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    const contentType = response.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        const data = await response.json();
+                        message.textContent = data.message || 'Upload failed.';
+                    } else {
+                        message.textContent = 'Upload failed.';
+                    }
+                    message.classList.add('text-danger');
+                    return;
+                }
+
+                container.innerHTML = await response.text();
+                filesInput.value = '';
+                message.textContent = 'Upload completed.';
+                message.classList.add('text-success');
+            });
+
+            container.addEventListener('click', async function (event) {
+                const button = event.target.closest('.js-delete-attachment');
+                if (!button) {
+                    return;
+                }
+
+                if (!confirm('Delete this attachment?')) {
+                    return;
+                }
+
+                const attachmentId = button.dataset.attachmentId;
+                const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+                const formData = new FormData();
+                formData.append('__RequestVerificationToken', token);
+
+                const response = await fetch(`/products/${productId}/attachments/${attachmentId}/delete`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    alert('Delete failed. Only Admin can delete attachments.');
+                    return;
+                }
+
+                container.innerHTML = await response.text();
+            });
+
+            loadAttachments();
+        });
+    </script>
 }
