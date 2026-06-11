@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using InventoryManagement.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.DAL.Repositories
 {
@@ -17,7 +14,7 @@ namespace InventoryManagement.DAL.Repositories
 
         public List<User> GetAll()
         {
-            return _context.Users
+            return _context.BusinessUsers
                 .AsNoTracking()
                 .Include(u => u.Orders)
                 .ToList();
@@ -25,7 +22,7 @@ namespace InventoryManagement.DAL.Repositories
 
         public User? GetById(int id)
         {
-            return _context.Users
+            return _context.BusinessUsers
                 .AsNoTracking()
                 .Include(u => u.Orders)
                 .FirstOrDefault(u => u.Id == id);
@@ -33,56 +30,66 @@ namespace InventoryManagement.DAL.Repositories
 
         public void Add(User user)
         {
-            _context.Users.Add(user);
+            _context.BusinessUsers.Add(user);
             _context.SaveChanges();
         }
 
         public void Update(User user)
         {
-            _context.Users.Update(user);
+            _context.BusinessUsers.Update(user);
             _context.SaveChanges();
         }
 
         public bool Delete(int id)
         {
             if (!Exists(id))
-                return false;
-
-            if (!CanDelete(id))
-                return false;
-
-            var user = _context.Users.Find(id);
-            if (user != null)
             {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
-                return true;
+                return false;
             }
 
-            return false;
+            if (!CanDelete(id))
+            {
+                return false;
+            }
+
+            var user = _context.BusinessUsers.Find(id);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            _context.BusinessUsers.Remove(user);
+            _context.SaveChanges();
+
+            return true;
         }
 
         public bool Exists(int id)
         {
-            return _context.Users.Any(u => u.Id == id);
+            return _context.BusinessUsers.Any(u => u.Id == id);
         }
 
         public bool CanDelete(int id)
         {
-            var user = _context.Users
+            var user = _context.BusinessUsers
                 .AsNoTracking()
                 .Include(u => u.Orders)
                 .FirstOrDefault(u => u.Id == id);
 
             if (user == null)
+            {
                 return false;
+            }
 
             return !user.Orders.Any();
         }
 
         public List<User> Search(string? term, int maxResults = 50)
         {
-            var query = _context.Users.AsNoTracking().Include(u => u.Orders);
+            IQueryable<User> query = _context.BusinessUsers
+                .AsNoTracking()
+                .Include(u => u.Orders);
 
             if (string.IsNullOrWhiteSpace(term))
             {
@@ -94,6 +101,7 @@ namespace InventoryManagement.DAL.Repositories
             }
 
             term = term.ToLower();
+
             return query
                 .Where(u =>
                     u.FirstName.ToLower().Contains(term) ||

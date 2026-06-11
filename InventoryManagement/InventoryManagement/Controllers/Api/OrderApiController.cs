@@ -84,7 +84,7 @@ namespace InventoryManagement.Controllers.Api
                 return BadRequest(ModelState);
             }
 
-            var userExists = await _dbContext.Users
+            var userExists = await _dbContext.BusinessUsers
                 .AnyAsync(u => u.Id == model.UserId!.Value);
 
             if (!userExists)
@@ -141,7 +141,7 @@ namespace InventoryManagement.Controllers.Api
                 return NotFound();
             }
 
-            var userExists = await _dbContext.Users
+            var userExists = await _dbContext.BusinessUsers
                 .AnyAsync(u => u.Id == model.UserId!.Value);
 
             if (!userExists)

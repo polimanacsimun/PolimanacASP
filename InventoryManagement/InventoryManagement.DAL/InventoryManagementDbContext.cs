@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using InventoryManagement.Domain.Models;
+﻿using InventoryManagement.Domain.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.DAL
 {
-    public class InventoryManagementDbContext : DbContext
+    public class InventoryManagementDbContext : IdentityDbContext<AppUser>
     {
         public InventoryManagementDbContext(DbContextOptions<InventoryManagementDbContext> options)
             : base(options)
@@ -16,7 +17,7 @@ namespace InventoryManagement.DAL
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
         public DbSet<InventoryItem> InventoryItems { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> BusinessUsers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
 
@@ -217,6 +218,8 @@ modelBuilder.Entity<OrderItem>()
                     Type = InventoryManagement.Domain.Enums.WarehouseType.Regional
                 }
             );
+
+            modelBuilder.Entity<User>().ToTable("Users");
 
             // Users
             modelBuilder.Entity<User>().HasData(

@@ -23,7 +23,7 @@ namespace InventoryManagement.Controllers.Api
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAll([FromQuery] string? q)
         {
-            IQueryable<User> query = _dbContext.Users
+            IQueryable<User> query = _dbContext.BusinessUsers
                 .AsNoTracking()
                 .Include(u => u.Orders);
 
@@ -55,7 +55,7 @@ namespace InventoryManagement.Controllers.Api
         [HttpGet("{id:int}")]
         public async Task<ActionResult<UserDto>> GetById(int id)
         {
-            var user = await _dbContext.Users
+            var user = await _dbContext.BusinessUsers
                 .AsNoTracking()
                 .Include(u => u.Orders)
                 .FirstOrDefaultAsync(u => u.Id == id);
@@ -77,7 +77,7 @@ namespace InventoryManagement.Controllers.Api
                 return BadRequest(ModelState);
             }
 
-            var emailExists = await _dbContext.Users
+            var emailExists = await _dbContext.BusinessUsers
                 .AnyAsync(u => u.Email == model.Email);
 
             if (emailExists)
@@ -96,7 +96,7 @@ namespace InventoryManagement.Controllers.Api
                 IsActive = model.IsActive ?? true
             };
 
-            _dbContext.Users.Add(user);
+            _dbContext.BusinessUsers.Add(user);
             await _dbContext.SaveChangesAsync();
 
             return CreatedAtAction(
@@ -114,7 +114,7 @@ namespace InventoryManagement.Controllers.Api
                 return BadRequest(ModelState);
             }
 
-            var user = await _dbContext.Users
+            var user = await _dbContext.BusinessUsers
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
@@ -122,7 +122,7 @@ namespace InventoryManagement.Controllers.Api
                 return NotFound();
             }
 
-            var emailExists = await _dbContext.Users
+            var emailExists = await _dbContext.BusinessUsers
                 .AnyAsync(u => u.Id != id && u.Email == model.Email);
 
             if (emailExists)
@@ -147,7 +147,7 @@ namespace InventoryManagement.Controllers.Api
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var user = await _dbContext.Users
+            var user = await _dbContext.BusinessUsers
                 .Include(u => u.Orders)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
@@ -164,7 +164,7 @@ namespace InventoryManagement.Controllers.Api
                 });
             }
 
-            _dbContext.Users.Remove(user);
+            _dbContext.BusinessUsers.Remove(user);
             await _dbContext.SaveChangesAsync();
 
             return NoContent();
