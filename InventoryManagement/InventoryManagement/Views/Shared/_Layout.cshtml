@@ -35,16 +35,30 @@
             : $"{appUser.FirstName} {appUser.LastName}";
     }
 
-    var pageTitle = ViewData["Title"]?.ToString() ?? "Dashboard";
+    var pageTitle = ViewData["Title"]?.ToString();
+
+    if (string.IsNullOrWhiteSpace(pageTitle))
+    {
+        pageTitle = currentController switch
+        {
+            "Product" => "Products",
+            "Supplier" => "Suppliers",
+            "Category" => "Categories",
+            "Warehouse" => "Warehouses",
+            "User" => "Users",
+            "Order" => "Orders",
+            "InventoryItem" => "Inventory",
+            "OrderItem" => "Order Items",
+            _ => "Dashboard"
+        };
+    }
 
     if (isDashboard && !string.IsNullOrWhiteSpace(dashboardDisplayName))
     {
         pageTitle = $"Dashboard - Hello, {dashboardDisplayName}";
     }
 
-    var pageTitleClass = isDashboard
-        ? "h5 mb-0 dashboard-rgb-title"
-        : "h5 mb-0";
+    var pageTitleClass = "h5 mb-0 app-rgb-title";
 
     Func<string, string> active = controller =>
         string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase)
