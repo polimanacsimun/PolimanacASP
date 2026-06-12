@@ -227,11 +227,11 @@ body.app-body {
   -webkit-background-clip: initial;
   background-clip: initial;
   -webkit-text-fill-color: #ffffff !important;
-  -webkit-text-stroke: .28px rgba(2, 6, 23, .38);
+  -webkit-text-stroke: .36px rgba(2, 6, 23, .44);
   animation: none;
   text-shadow:
-    0 1px 1px rgba(2, 6, 23, .28),
-    0 2px 5px rgba(15, 23, 42, .14),
+    0 1px 1px rgba(2, 6, 23, .34),
+    0 3px 7px rgba(15, 23, 42, .18),
     0 0 12px rgba(255, 255, 255, .5),
     0 0 22px rgba(34, 211, 238, .22),
     0 0 28px rgba(167, 139, 250, .18);
