@@ -51,6 +51,18 @@
                         <a asp-controller="Account" asp-action="Register">Create one</a>
                     </div>
                 </form>
+
+                <div class="my-4 d-flex align-items-center gap-2 text-muted small">
+                    <hr class="flex-grow-1" />
+                    <span>or</span>
+                    <hr class="flex-grow-1" />
+                </div>
+
+                <form asp-action="ExternalLogin" method="post" asp-route-returnUrl="@returnUrl">
+                    <button type="submit" name="provider" value="Google" class="btn btn-outline-dark btn-lg w-100">
+                        Continue with Google
+                    </button>
+                </form>
             </div>
         </div>
     </div>

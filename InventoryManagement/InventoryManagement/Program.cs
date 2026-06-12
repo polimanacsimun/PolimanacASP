@@ -38,13 +38,22 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
-builder.Services
-    .AddAuthentication()
-    .AddGoogle(options =>
-    {
-        builder.Configuration.GetSection("Authentication:Google").Bind(options);
-        options.SaveTokens = true;
-    });
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+if (!builder.Environment.IsEnvironment("Testing") &&
+    !string.IsNullOrWhiteSpace(googleClientId) &&
+    !string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    builder.Services
+        .AddAuthentication()
+        .AddGoogle(options =>
+        {
+            options.ClientId = googleClientId;
+            options.ClientSecret = googleClientSecret;
+            options.SaveTokens = true;
+        });
+}
 
 // Existing EF repositories
 builder.Services.AddScoped<ProductEfRepository>();
