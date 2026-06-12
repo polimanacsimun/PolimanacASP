@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using InventoryManagement.Domain.Models;
 using InventoryManagement.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -120,6 +121,133 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+        {
+            if (string.IsNullOrWhiteSpace(provider))
+            {
+                return RedirectToAction(nameof(Login), new { returnUrl });
+            }
+
+            var redirectUrl = Url.Action(
+                nameof(ExternalLoginCallback),
+                "Account",
+                new { returnUrl });
+
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+            return Challenge(properties, provider);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null)
+        {
+            if (!string.IsNullOrWhiteSpace(remoteError))
+            {
+                ModelState.AddModelError(string.Empty, $"External login error: {remoteError}");
+                ViewData["ReturnUrl"] = returnUrl;
+                return View(nameof(Login));
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+            {
+                ModelState.AddModelError(string.Empty, "External login information could not be loaded.");
+                ViewData["ReturnUrl"] = returnUrl;
+                return View(nameof(Login));
+            }
+
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,
+                info.ProviderKey,
+                isPersistent: false,
+                bypassTwoFactor: true);
+
+            if (signInResult.Succeeded)
+            {
+                var existingExternalUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+                var existingName = existingExternalUser?.FirstName ?? info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? "User";
+
+                TempData["ToastMessage"] = $"Welcome back, {existingName}! You signed in with {info.LoginProvider}.";
+
+                return RedirectToLocal(returnUrl);
+            }
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                ModelState.AddModelError(string.Empty, "External provider did not return an email address.");
+                ViewData["ReturnUrl"] = returnUrl;
+                return View(nameof(Login));
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
+                var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
+                var fullName = info.Principal.FindFirstValue(ClaimTypes.Name);
+
+                if (string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(fullName))
+                {
+                    var nameParts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    firstName = nameParts.FirstOrDefault();
+                    lastName = nameParts.Length > 1 ? string.Join(' ', nameParts.Skip(1)) : "External";
+                }
+
+                user = new AppUser
+                {
+                    UserName = email,
+                    Email = email,
+                    EmailConfirmed = true,
+                    FirstName = firstName ?? "External",
+                    LastName = lastName ?? "User",
+                    OIB = "00000000000",
+                    JMBG = "0000000000000"
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+
+                if (!createResult.Succeeded)
+                {
+                    foreach (var error in createResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    ViewData["ReturnUrl"] = returnUrl;
+                    return View(nameof(Login));
+                }
+
+                await _userManager.AddToRoleAsync(user, "Manager");
+            }
+
+            var addLoginResult = await _userManager.AddLoginAsync(user, info);
+
+            if (!addLoginResult.Succeeded)
+            {
+                foreach (var error in addLoginResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                ViewData["ReturnUrl"] = returnUrl;
+                return View(nameof(Login));
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            TempData["ToastMessage"] = $"Welcome, {user.FirstName}! You signed in with {info.LoginProvider}.";
+
+            return RedirectToLocal(returnUrl);
+        }
+
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -135,6 +263,16 @@ namespace InventoryManagement.Controllers
         public IActionResult AccessDenied()
         {
             return View();
+        }
+
+        private IActionResult RedirectToLocal(string? returnUrl)
+        {
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }
