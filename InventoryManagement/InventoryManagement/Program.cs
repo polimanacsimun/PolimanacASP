@@ -38,6 +38,14 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
+builder.Services
+    .AddAuthentication()
+    .AddGoogle(options =>
+    {
+        builder.Configuration.GetSection("Authentication:Google").Bind(options);
+        options.SaveTokens = true;
+    });
+
 // Existing EF repositories
 builder.Services.AddScoped<ProductEfRepository>();
 builder.Services.AddScoped<SupplierEfRepository>();
@@ -77,3 +85,7 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.Run();
+
+public partial class Program
+{
+}
