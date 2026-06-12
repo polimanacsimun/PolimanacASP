@@ -212,6 +212,7 @@ body.app-body {
   letter-spacing: -.02em;
 }
 
+.app-rgb-title,
 .dashboard-rgb-title {
   display: inline-block;
   position: relative;
@@ -226,16 +227,18 @@ body.app-body {
   -webkit-background-clip: initial;
   background-clip: initial;
   -webkit-text-fill-color: #ffffff !important;
-  -webkit-text-stroke: 0;
+  -webkit-text-stroke: .28px rgba(2, 6, 23, .38);
   animation: none;
   text-shadow:
-    0 2px 4px rgba(15, 23, 42, .18),
+    0 1px 1px rgba(2, 6, 23, .28),
+    0 2px 5px rgba(15, 23, 42, .14),
     0 0 12px rgba(255, 255, 255, .5),
     0 0 22px rgba(34, 211, 238, .22),
     0 0 28px rgba(167, 139, 250, .18);
   filter: none;
 }
 
+.app-rgb-title::before,
 .dashboard-rgb-title::before {
   display: none;
 }
