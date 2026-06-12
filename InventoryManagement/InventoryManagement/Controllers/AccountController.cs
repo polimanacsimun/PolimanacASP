@@ -1,4 +1,4 @@
-﻿using InventoryManagement.Domain.Models;
+using InventoryManagement.Domain.Models;
 using InventoryManagement.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -58,6 +58,8 @@ namespace InventoryManagement.Controllers
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
 
+                TempData["ToastMessage"] = $"Welcome, {user.FirstName}! Your account was created successfully.";
+
                 return RedirectToAction("Index", "Home");
             }
 
@@ -98,6 +100,13 @@ namespace InventoryManagement.Controllers
 
             if (result.Succeeded)
             {
+                var appUser = await _userManager.FindByEmailAsync(model.Email);
+                var displayName = appUser == null
+                    ? model.Email
+                    : appUser.FirstName;
+
+                TempData["ToastMessage"] = $"Welcome back, {displayName}! You signed in successfully.";
+
                 if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
                     return Redirect(returnUrl);
