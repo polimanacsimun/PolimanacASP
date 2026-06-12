@@ -222,19 +222,17 @@ body.app-body {
   font-weight: 900 !important;
   letter-spacing: .01em;
   color: #ffffff !important;
-  background: linear-gradient(90deg, #ffffff 0%, #38e8ff 22%, #c4b5fd 42%, #78f7df 62%, #93c5fd 82%, #ffffff 100%);
-  background-size: 420% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: .75px rgba(2, 6, 23, .92);
-  animation: rgbTitleShift 14s ease-in-out infinite;
+  background: none !important;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-text-stroke: 0;
+  animation: none;
   text-shadow:
-    0 1px 0 rgba(2, 6, 23, .95),
-    0 0 2px rgba(2, 6, 23, .9),
-    0 0 8px rgba(255, 255, 255, .48),
-    0 0 16px rgba(34, 211, 238, .32),
-    0 0 22px rgba(167, 139, 250, .22);
+    0 2px 4px rgba(15, 23, 42, .18),
+    0 0 12px rgba(255, 255, 255, .5),
+    0 0 22px rgba(34, 211, 238, .22),
+    0 0 28px rgba(167, 139, 250, .18);
   filter: none;
 }
 
