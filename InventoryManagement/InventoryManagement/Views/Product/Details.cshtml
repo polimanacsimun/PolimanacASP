@@ -21,10 +21,10 @@
         </div>
         <div class="text-end">
             <div class="btn-group-vertical btn-group-sm" role="group">
-                <a href="/catalog/@Model.Id/edit" class="btn btn-outline-info">
+                <a href="/catalog/@Model.Id/edit" class="btn btn-outline-info" asp-authorize-role="Admin">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
-                <a href="/catalog/@Model.Id/delete" class="btn btn-outline-danger">
+                <a href="/catalog/@Model.Id/delete" class="btn btn-outline-danger" asp-authorize-role="Admin">
                     <i class="bi bi-trash"></i> Delete
                 </a>
                 <a asp-controller="Product" asp-action="Index" class="btn btn-outline-secondary">
@@ -105,6 +105,28 @@
                             }
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">Product attachments</h5>
+                            <p class="text-muted mb-0">Files and images added by an administrator.</p>
+                        </div>
+                        <a href="/catalog/@Model.Id/edit" class="btn btn-sm btn-outline-primary" asp-authorize-role="Admin">
+                            Manage attachments
+                        </a>
+                    </div>
+
+                    @await Html.PartialAsync(
+                        "_ProductAttachments",
+                        Model.Attachments.OrderByDescending(a => a.CreatedAt),
+                        new ViewDataDictionary(ViewData)
+                        {
+                            ["ShowAttachmentActions"] = false
+                        })
                 </div>
             </div>
         </div>

@@ -42,10 +42,10 @@ else
                     <a href="/orders/@item.Id/summary" class="btn btn-outline-primary" title="View Details">
                         Details
                     </a>
-                    <a href="/orders/@item.Id/edit" class="btn btn-outline-info" title="Edit Order">
+                    <a href="/orders/@item.Id/edit" class="btn btn-outline-info" title="Edit Order" asp-authorize-role="Admin">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a href="/orders/@item.Id/delete" class="btn btn-outline-danger" title="Delete Order">
+                    <a href="/orders/@item.Id/delete" class="btn btn-outline-danger" title="Delete Order" asp-authorize-role="Admin">
                         <i class="bi bi-trash"></i>
                     </a>
                 </div>

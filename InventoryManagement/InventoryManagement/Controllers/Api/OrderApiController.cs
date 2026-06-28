@@ -79,6 +79,7 @@ namespace InventoryManagement.Controllers.Api
 
         // POST: /api/orders
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<OrderDto>> Create([FromBody] OrderRequestDto model)
         {
             if (!ModelState.IsValid)
@@ -128,6 +129,7 @@ namespace InventoryManagement.Controllers.Api
 
         // PUT: /api/orders/5
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<OrderDto>> Update(int id, [FromBody] OrderRequestDto model)
         {
             if (!ModelState.IsValid)

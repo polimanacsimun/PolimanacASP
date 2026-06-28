@@ -1,9 +1,12 @@
 using System.Security.Claims;
+using InventoryManagement.DAL;
+using InventoryManagement.Domain.Enums;
 using InventoryManagement.Domain.Models;
 using InventoryManagement.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.Controllers
 {
@@ -11,13 +14,16 @@ namespace InventoryManagement.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly InventoryManagementDbContext _dbContext;
 
         public AccountController(
             UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager)
+            SignInManager<AppUser> signInManager,
+            InventoryManagementDbContext dbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _dbContext = dbContext;
         }
 
         [AllowAnonymous]
@@ -56,6 +62,8 @@ namespace InventoryManagement.Controllers
                 {
                     await _userManager.AddToRoleAsync(user, "Manager");
                 }
+
+                await EnsureBusinessUserExistsAsync(user, UserRole.Customer);
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
 
@@ -226,6 +234,7 @@ namespace InventoryManagement.Controllers
                 }
 
                 await _userManager.AddToRoleAsync(user, "Manager");
+                await EnsureBusinessUserExistsAsync(user, UserRole.Customer);
             }
 
             var addLoginResult = await _userManager.AddLoginAsync(user, info);
@@ -246,6 +255,36 @@ namespace InventoryManagement.Controllers
             TempData["ToastMessage"] = $"Welcome, {user.FirstName}! You signed in with {info.LoginProvider}.";
 
             return RedirectToLocal(returnUrl);
+        }
+
+        private async Task EnsureBusinessUserExistsAsync(AppUser appUser, UserRole role)
+        {
+            if (string.IsNullOrWhiteSpace(appUser.Email))
+            {
+                return;
+            }
+
+            var email = appUser.Email.Trim();
+            var normalizedEmail = email.ToUpperInvariant();
+            var exists = await _dbContext.BusinessUsers
+                .AnyAsync(u => u.Email.ToUpper() == normalizedEmail);
+
+            if (exists)
+            {
+                return;
+            }
+
+            _dbContext.BusinessUsers.Add(new User
+            {
+                FirstName = appUser.FirstName,
+                LastName = appUser.LastName,
+                Email = email,
+                Role = role,
+                RegistrationDate = DateTime.Today,
+                IsActive = true
+            });
+
+            await _dbContext.SaveChangesAsync();
         }
 
         [Authorize]

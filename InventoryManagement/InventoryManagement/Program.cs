@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // MVC + API controllers
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDbContext<InventoryManagementDbContext>(options =>
     options.UseSqlServer(

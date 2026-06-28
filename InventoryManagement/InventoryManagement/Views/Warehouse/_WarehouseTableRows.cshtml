@@ -40,10 +40,10 @@ else
                     <a href="/storage/@item.Id" class="btn btn-outline-primary" title="View Details">
                         Details
                     </a>
-                    <a href="/storage/@item.Id/edit" class="btn btn-outline-info" title="Edit Warehouse">
+                    <a href="/storage/@item.Id/edit" class="btn btn-outline-info" title="Edit Warehouse" asp-authorize-role="Admin">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a href="/storage/@item.Id/delete" class="btn btn-outline-danger" title="Delete Warehouse">
+                    <a href="/storage/@item.Id/delete" class="btn btn-outline-danger" title="Delete Warehouse" asp-authorize-role="Admin">
                         <i class="bi bi-trash"></i>
                     </a>
                 </div>

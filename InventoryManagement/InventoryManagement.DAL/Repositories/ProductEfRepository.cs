@@ -30,6 +30,7 @@ namespace InventoryManagement.DAL.Repositories
                 .AsNoTracking()
                 .Include(p => p.Category)
                 .Include(p => p.Supplier)
+                .Include(p => p.Attachments)
                 .Include(p => p.InventoryItems)
                     .ThenInclude(ii => ii.Warehouse)
                 .Include(p => p.OrderItems)

@@ -21,7 +21,7 @@
       <p class="text-muted mb-0">Overview of all suppliers, contact details, status and the products they provide. Read-only view for procurement and vendor management.</p>
     </div>
     <div class="text-end">
-      <a href="/vendors/create" class="btn btn-primary btn-sm">
+      <a href="/vendors/create" class="btn btn-primary btn-sm" asp-authorize-role="Admin">
         <i class="bi bi-plus-circle"></i> Create Supplier
       </a>
     </div>

@@ -40,7 +40,7 @@ namespace InventoryManagement.Controllers
             return View(order);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [Route("/orders/create")]
         [Route("/Order/Create")]
         [HttpGet]
@@ -54,7 +54,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [Route("/orders/create")]
         [Route("/Order/Create")]
         [HttpPost]
@@ -81,7 +81,7 @@ namespace InventoryManagement.Controllers
             return RedirectToAction(nameof(Details), new { id = order.Id });
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [Route("/orders/{id:int}/edit")]
         [Route("/Order/Edit/{id:int}")]
         [HttpGet]
@@ -111,7 +111,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [Route("/orders/{id:int}/edit")]
         [Route("/Order/Edit/{id:int}")]
         [HttpPost]

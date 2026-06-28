@@ -68,6 +68,7 @@ namespace InventoryManagement.Controllers.Api
 
         // POST: /api/order-items
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<OrderItemDto>> Create([FromBody] OrderItemRequestDto model)
         {
             ValidateOrderItem(model);
@@ -133,6 +134,7 @@ namespace InventoryManagement.Controllers.Api
 
         // PUT: /api/order-items/5
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<OrderItemDto>> Update(int id, [FromBody] OrderItemRequestDto model)
         {
             ValidateOrderItem(model);

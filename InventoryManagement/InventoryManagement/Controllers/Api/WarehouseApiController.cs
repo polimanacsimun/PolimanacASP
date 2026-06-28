@@ -76,6 +76,7 @@ namespace InventoryManagement.Controllers.Api
 
         // POST: /api/warehouses
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<WarehouseDto>> Create([FromBody] WarehouseRequestDto model)
         {
             if (model.Capacity == null)
@@ -117,6 +118,7 @@ namespace InventoryManagement.Controllers.Api
 
         // PUT: /api/warehouses/5
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<WarehouseDto>> Update(int id, [FromBody] WarehouseRequestDto model)
         {
             if (model.Capacity == null)

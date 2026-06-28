@@ -60,6 +60,7 @@ namespace InventoryManagement.Controllers.Api
 
         // POST: /api/categories
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<CategoryDto>> Create([FromBody] CategoryRequestDto model)
         {
             if (!ModelState.IsValid)
@@ -84,6 +85,7 @@ namespace InventoryManagement.Controllers.Api
 
         // PUT: /api/categories/5
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<CategoryDto>> Update(int id, [FromBody] CategoryRequestDto model)
         {
             if (!ModelState.IsValid)

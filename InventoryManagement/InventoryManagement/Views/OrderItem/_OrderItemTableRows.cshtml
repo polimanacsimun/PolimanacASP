@@ -29,10 +29,10 @@ else
                     <a href="/order-items/@item.Id" class="btn btn-outline-primary" title="View Details">
                         Details
                     </a>
-                    <a href="/order-items/@item.Id/edit" class="btn btn-outline-info" title="Edit Item">
+                    <a href="/order-items/@item.Id/edit" class="btn btn-outline-info" title="Edit Item" asp-authorize-role="Admin">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a href="/order-items/@item.Id/delete" class="btn btn-outline-danger" title="Delete Item">
+                    <a href="/order-items/@item.Id/delete" class="btn btn-outline-danger" title="Delete Item" asp-authorize-role="Admin">
                         <i class="bi bi-trash"></i>
                     </a>
                 </div>

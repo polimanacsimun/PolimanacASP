@@ -39,10 +39,10 @@ else
                     <a href="/users/@item.Id" class="btn btn-outline-primary" title="View Details">
                         Details
                     </a>
-                    <a href="/users/@item.Id/edit" class="btn btn-outline-info" title="Edit User">
+                    <a href="/users/@item.Id/edit" class="btn btn-outline-info" title="Edit User" asp-authorize-role="Admin">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a href="/users/@item.Id/delete" class="btn btn-outline-danger" title="Delete User">
+                    <a href="/users/@item.Id/delete" class="btn btn-outline-danger" title="Delete User" asp-authorize-role="Admin">
                         <i class="bi bi-trash"></i>
                     </a>
                 </div>

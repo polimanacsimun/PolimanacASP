@@ -25,7 +25,7 @@
             <p class="text-muted mb-0">Overview of the warehouse network, capacity and operational status.</p>
         </div>
         <div class="mt-3 mt-md-0 d-flex gap-2">
-            <a href="/storage/create" class="btn btn-primary btn-sm">
+            <a href="/storage/create" class="btn btn-primary btn-sm" asp-authorize-role="Admin">
                 <i class="bi bi-plus-circle"></i> Create Warehouse
             </a>
             <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>

@@ -29,6 +29,7 @@ namespace InventoryManagement.Controllers
         }
 
         [HttpPost("upload")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upload(int productId, List<IFormFile> files)
         {

@@ -1,6 +1,11 @@
 @model IEnumerable<InventoryManagement.Domain.Models.ProductAttachment>
 
-@if (!Model.Any())
+@{
+    var attachments = Model.ToList();
+    var showActions = ViewData["ShowAttachmentActions"] as bool? ?? User.IsInRole("Admin");
+}
+
+@if (!attachments.Any())
 {
     <div class="alert alert-light border mb-0">
         No attachments uploaded for this product yet.
@@ -16,31 +21,45 @@ else
                     <th>Type</th>
                     <th>Size</th>
                     <th>Uploaded</th>
-                    <th class="text-end">Actions</th>
+                    @if (showActions)
+                    {
+                        <th class="text-end">Actions</th>
+                    }
                 </tr>
             </thead>
             <tbody>
-                @foreach (var attachment in Model)
+                @foreach (var attachment in attachments)
                 {
                     <tr>
                         <td>
-                            <a href="@attachment.FilePath" target="_blank" rel="noopener">
-                                @attachment.FileName
-                            </a>
+                            <div class="d-flex align-items-center gap-3">
+                                @if (IsImage(attachment.ContentType))
+                                {
+                                    <a href="@attachment.FilePath" target="_blank" rel="noopener" aria-label="Open @attachment.FileName">
+                                        <img src="@attachment.FilePath"
+                                             alt="@attachment.FileName"
+                                             class="rounded border object-fit-cover"
+                                             style="width: 72px; height: 72px;" />
+                                    </a>
+                                }
+                                <a href="@attachment.FilePath" target="_blank" rel="noopener">
+                                    @attachment.FileName
+                                </a>
+                            </div>
                         </td>
                         <td>@attachment.ContentType</td>
                         <td>@FormatFileSize(attachment.FileSize)</td>
                         <td>@attachment.CreatedAt.ToLocalTime().ToString("g")</td>
-                        <td class="text-end">
-                            @if (User.IsInRole("Admin"))
-                            {
+                        @if (showActions)
+                        {
+                            <td class="text-end">
                                 <button type="button"
                                         class="btn btn-sm btn-outline-danger js-delete-attachment"
                                         data-attachment-id="@attachment.Id">
                                     Delete
                                 </button>
-                            }
-                        </td>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>
@@ -62,5 +81,10 @@ else
         }
 
         return $"{bytes / 1024d / 1024d:0.##} MB";
+    }
+
+    private static bool IsImage(string contentType)
+    {
+        return contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase);
     }
 }

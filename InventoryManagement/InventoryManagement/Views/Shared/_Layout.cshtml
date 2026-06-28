@@ -159,6 +159,12 @@
                 <div class="app-page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
                     <h2 class="@pageTitleClass">@pageTitle</h2>
                     <div class="text-muted small">
+                        <span class="me-2">
+                            Access:
+                            <strong class="@(User.IsInRole("Admin") ? "text-warning" : "text-primary")">
+                                @(User.IsInRole("Admin") ? "Administrator" : "Read only")
+                            </strong>
+                        </span>
                         <span class="me-2">Status: <strong class="text-success">Operational</strong></span>
                         <span class="d-none d-md-inline">| Last updated: @DateTime.Now.ToString("yyyy-MM-dd")</span>
                     </div>

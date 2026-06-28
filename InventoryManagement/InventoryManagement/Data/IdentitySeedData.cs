@@ -1,5 +1,8 @@
-﻿using InventoryManagement.Domain.Models;
+using InventoryManagement.DAL;
+using InventoryManagement.Domain.Enums;
+using InventoryManagement.Domain.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.Data
 {
@@ -9,6 +12,7 @@ namespace InventoryManagement.Data
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+            var dbContext = serviceProvider.GetRequiredService<InventoryManagementDbContext>();
 
             string[] roles =
             {
@@ -45,6 +49,8 @@ namespace InventoryManagement.Data
                 oib: "23456789012",
                 jmbg: "2345678901234",
                 role: "Manager");
+
+            await SyncIdentityUsersToBusinessUsersAsync(userManager, dbContext);
         }
 
         private static async Task CreateUserIfMissing(
@@ -91,6 +97,45 @@ namespace InventoryManagement.Data
                 var errors = string.Join("; ", result.Errors.Select(e => e.Description));
                 throw new InvalidOperationException($"Could not create seed user {email}: {errors}");
             }
+        }
+
+        private static async Task SyncIdentityUsersToBusinessUsersAsync(
+            UserManager<AppUser> userManager,
+            InventoryManagementDbContext dbContext)
+        {
+            var appUsers = await userManager.Users.ToListAsync();
+
+            foreach (var appUser in appUsers)
+            {
+                if (string.IsNullOrWhiteSpace(appUser.Email))
+                {
+                    continue;
+                }
+
+                var email = appUser.Email.Trim();
+                var normalizedEmail = email.ToUpperInvariant();
+                var exists = await dbContext.BusinessUsers
+                    .AnyAsync(u => u.Email.ToUpper() == normalizedEmail);
+
+                if (exists)
+                {
+                    continue;
+                }
+
+                var isAdmin = await userManager.IsInRoleAsync(appUser, "Admin");
+
+                dbContext.BusinessUsers.Add(new User
+                {
+                    FirstName = appUser.FirstName,
+                    LastName = appUser.LastName,
+                    Email = email,
+                    Role = isAdmin ? UserRole.Administrator : UserRole.Customer,
+                    RegistrationDate = DateTime.Today,
+                    IsActive = true
+                });
+            }
+
+            await dbContext.SaveChangesAsync();
         }
     }
 }

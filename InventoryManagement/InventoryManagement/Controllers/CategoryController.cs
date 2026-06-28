@@ -36,7 +36,7 @@ namespace InventoryManagement.Controllers
             return View(category);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [Route("/categories/create")]
         [Route("Category/Create")]
         public IActionResult Create()
@@ -45,7 +45,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/categories/create")]
@@ -67,7 +67,7 @@ namespace InventoryManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [Route("/categories/{id:int}/edit")]
         [Route("Category/Edit/{id:int}")]
         public IActionResult Edit(int id)
@@ -88,7 +88,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/categories/{id:int}/edit")]

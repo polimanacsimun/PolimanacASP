@@ -36,7 +36,7 @@ namespace InventoryManagement.Controllers
             return View(supplier);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [Route("/vendors/create")]
         [Route("Supplier/Create")]
         public IActionResult Create()
@@ -45,7 +45,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/vendors/create")]
@@ -72,7 +72,7 @@ namespace InventoryManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [Route("/vendors/{id:int}/edit")]
         [Route("Supplier/Edit/{id:int}")]
         public IActionResult Edit(int id)
@@ -98,7 +98,7 @@ namespace InventoryManagement.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/vendors/{id:int}/edit")]

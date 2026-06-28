@@ -11,11 +11,15 @@
         var displayName = appUser == null
             ? User.Identity?.Name
             : $"{appUser.FirstName} {appUser.LastName}";
+        var isAdmin = User.IsInRole("Admin");
 
         <li class="nav-item">
             <span class="user-greeting">
                 <span class="user-greeting-dot" aria-hidden="true"></span>
                 <span>@displayName</span>
+                <span class="badge rounded-pill @(isAdmin ? "bg-warning text-dark" : "bg-light text-dark") ms-1">
+                    @(isAdmin ? "Admin" : "View only")
+                </span>
             </span>
         </li>
         <li class="user-action-divider d-none d-lg-block" aria-hidden="true"></li>
