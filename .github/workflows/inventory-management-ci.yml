@@ -35,6 +35,9 @@ jobs:
       - name: Build tests
         run: dotnet build InventoryManagement.Tests/InventoryManagement.Tests.csproj --configuration Release --no-restore
 
+      - name: Install Playwright browser
+        run: pwsh InventoryManagement.Tests/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
+
       - name: Test
         run: dotnet test InventoryManagement.Tests/InventoryManagement.Tests.csproj --configuration Release --no-build
 
