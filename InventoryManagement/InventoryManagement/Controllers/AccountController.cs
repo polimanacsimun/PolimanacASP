@@ -15,15 +15,18 @@ namespace InventoryManagement.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly InventoryManagementDbContext _dbContext;
+        private readonly ILogger<AccountController> _logger;
 
         public AccountController(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            InventoryManagementDbContext dbContext)
+            InventoryManagementDbContext dbContext,
+            ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         [AllowAnonymous]
@@ -68,9 +71,15 @@ namespace InventoryManagement.Controllers
                 await _signInManager.SignInAsync(user, isPersistent: false);
 
                 TempData["ToastMessage"] = $"Welcome, {user.FirstName}! Your account was created successfully.";
+                _logger.LogInformation("Local account registered and signed in for {Email}.", user.Email);
 
                 return RedirectToAction("Index", "Home");
             }
+
+            _logger.LogWarning(
+                "Local account registration failed for {Email}. Errors: {Errors}",
+                model.Email,
+                string.Join("; ", result.Errors.Select(error => error.Code)));
 
             foreach (var error in result.Errors)
             {
@@ -115,6 +124,7 @@ namespace InventoryManagement.Controllers
                     : appUser.FirstName;
 
                 TempData["ToastMessage"] = $"Welcome back, {displayName}! You signed in successfully.";
+                _logger.LogInformation("Local login succeeded for {Email}.", model.Email);
 
                 if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
@@ -125,6 +135,7 @@ namespace InventoryManagement.Controllers
             }
 
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            _logger.LogWarning("Local login failed for {Email}.", model.Email);
 
             return View(model);
         }
@@ -136,6 +147,7 @@ namespace InventoryManagement.Controllers
         {
             if (string.IsNullOrWhiteSpace(provider))
             {
+                _logger.LogWarning("External login request was rejected because provider was missing.");
                 return RedirectToAction(nameof(Login), new { returnUrl });
             }
 
@@ -155,6 +167,7 @@ namespace InventoryManagement.Controllers
         {
             if (!string.IsNullOrWhiteSpace(remoteError))
             {
+                _logger.LogWarning("External login returned an error: {RemoteError}.", remoteError);
                 ModelState.AddModelError(string.Empty, $"External login error: {remoteError}");
                 ViewData["ReturnUrl"] = returnUrl;
                 return View(nameof(Login));
@@ -164,6 +177,7 @@ namespace InventoryManagement.Controllers
 
             if (info == null)
             {
+                _logger.LogWarning("External login information could not be loaded.");
                 ModelState.AddModelError(string.Empty, "External login information could not be loaded.");
                 ViewData["ReturnUrl"] = returnUrl;
                 return View(nameof(Login));
@@ -181,6 +195,9 @@ namespace InventoryManagement.Controllers
                 var existingName = existingExternalUser?.FirstName ?? info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? "User";
 
                 TempData["ToastMessage"] = $"Welcome back, {existingName}! You signed in with {info.LoginProvider}.";
+                _logger.LogInformation(
+                    "External login succeeded for existing user through {Provider}.",
+                    info.LoginProvider);
 
                 return RedirectToLocal(returnUrl);
             }
@@ -189,6 +206,7 @@ namespace InventoryManagement.Controllers
 
             if (string.IsNullOrWhiteSpace(email))
             {
+                _logger.LogWarning("External login through {Provider} did not return an email address.", info.LoginProvider);
                 ModelState.AddModelError(string.Empty, "External provider did not return an email address.");
                 ViewData["ReturnUrl"] = returnUrl;
                 return View(nameof(Login));
@@ -224,6 +242,12 @@ namespace InventoryManagement.Controllers
 
                 if (!createResult.Succeeded)
                 {
+                    _logger.LogWarning(
+                        "External account creation failed for {Email} through {Provider}. Errors: {Errors}",
+                        email,
+                        info.LoginProvider,
+                        string.Join("; ", createResult.Errors.Select(error => error.Code)));
+
                     foreach (var error in createResult.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
@@ -241,6 +265,12 @@ namespace InventoryManagement.Controllers
 
             if (!addLoginResult.Succeeded)
             {
+                _logger.LogWarning(
+                    "External login association failed for {Email} through {Provider}. Errors: {Errors}",
+                    email,
+                    info.LoginProvider,
+                    string.Join("; ", addLoginResult.Errors.Select(error => error.Code)));
+
                 foreach (var error in addLoginResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
@@ -253,6 +283,10 @@ namespace InventoryManagement.Controllers
             await _signInManager.SignInAsync(user, isPersistent: false);
 
             TempData["ToastMessage"] = $"Welcome, {user.FirstName}! You signed in with {info.LoginProvider}.";
+            _logger.LogInformation(
+                "External login succeeded for {Email} through {Provider}.",
+                email,
+                info.LoginProvider);
 
             return RedirectToLocal(returnUrl);
         }
@@ -292,7 +326,9 @@ namespace InventoryManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            var userName = User.Identity?.Name ?? "unknown";
             await _signInManager.SignOutAsync();
+            _logger.LogInformation("User {UserName} signed out.", userName);
 
             return RedirectToAction("Index", "Home");
         }

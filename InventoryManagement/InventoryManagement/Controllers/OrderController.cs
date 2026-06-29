@@ -66,6 +66,12 @@ namespace InventoryManagement.Controllers
                 return View(model);
             }
 
+            if (model.UserId is not int userId)
+            {
+                ModelState.AddModelError(nameof(model.UserId), "User is required.");
+                return View(model);
+            }
+
             var order = new Order
             {
                 OrderNumber = model.OrderNumber,
@@ -74,7 +80,7 @@ namespace InventoryManagement.Controllers
                 Status = model.Status,
                 DeliveryDate = model.DeliveryDate,
                 Note = model.Note,
-                UserId = model.UserId.Value
+                UserId = userId
             };
 
             _repository.Add(order);
@@ -134,13 +140,19 @@ namespace InventoryManagement.Controllers
                 return NotFound();
             }
 
+            if (model.UserId is not int userId)
+            {
+                ModelState.AddModelError(nameof(model.UserId), "User is required.");
+                return View(model);
+            }
+
             order.OrderNumber = model.OrderNumber;
             order.OrderDate = model.OrderDate;
             order.TotalPrice = model.TotalPrice;
             order.Status = model.Status;
             order.DeliveryDate = model.DeliveryDate;
             order.Note = model.Note;
-            order.UserId = model.UserId.Value;
+            order.UserId = userId;
 
             _repository.Update(order);
             return RedirectToAction(nameof(Details), new { id = order.Id });

@@ -188,6 +188,7 @@ body.app-body {
 
 .app-main {
   background: transparent;
+  min-height: calc(100vh - 82px);
 }
 
 .app-page-container {
@@ -196,10 +197,15 @@ body.app-body {
 
 .app-auth-container {
   max-width: 1280px;
+  min-height: calc(100vh - 130px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .auth-stage {
-  min-height: calc(100vh - 190px);
+  width: 100%;
+  min-height: calc(100vh - 170px);
 }
 
 .app-page-heading {
@@ -452,6 +458,92 @@ footer.site-footer {
   overflow: hidden;
 }
 
+.global-search-nav {
+  min-width: 260px;
+  max-width: 360px;
+}
+
+.global-search-nav .input-group {
+  overflow: hidden;
+  border: 1px solid rgba(100, 116, 139, .2);
+  border-radius: .5rem;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .06);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.global-search-nav .form-control,
+.global-search-nav .input-group-text,
+.global-search-nav .btn {
+  min-height: 38px;
+}
+
+.global-search-nav .form-control,
+.global-search-nav .input-group-text,
+.global-search-nav .btn,
+.global-search-panel .form-control,
+.global-search-panel .input-group-text,
+.global-search-panel .btn {
+  border: 0;
+}
+
+.global-search-nav .form-control:focus,
+.global-search-panel .form-control:focus {
+  outline: 0;
+  box-shadow: none;
+}
+
+.global-search-panel .input-group {
+  overflow: hidden;
+  border: 1px solid rgba(100, 116, 139, .2);
+  border-radius: .75rem;
+  background: #fff;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.global-search-nav .input-group:focus-within,
+.global-search-panel .input-group:focus-within {
+  border-color: rgba(13, 110, 253, .65);
+  box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .16);
+}
+
+.global-search-panel {
+  padding: 1rem;
+  border: 1px solid rgba(100, 116, 139, .18);
+  border-radius: .85rem;
+  background: rgba(255, 255, 255, .74);
+}
+
+.global-search-count {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .65rem .9rem;
+  border-radius: .8rem;
+  background: rgba(255, 255, 255, .8);
+  border: 1px solid rgba(100, 116, 139, .18);
+}
+
+.global-search-count strong {
+  font-size: 1.45rem;
+  line-height: 1;
+  color: #0d6efd;
+}
+
+.global-search-empty {
+  border: 1px dashed rgba(100, 116, 139, .35);
+  border-radius: .85rem;
+  background: rgba(255, 255, 255, .55);
+}
+
+.global-search-result {
+  border-color: rgba(100, 116, 139, .14);
+}
+
+.global-search-result:hover {
+  background: #f8fbff;
+}
+
 /* Global action button colors */
 a[href*="/Details"],
 a[href*="/details"],
@@ -502,6 +594,16 @@ a[href*="/delete"]:hover {
 }
 
 @media (max-width: 991px) {
+  .site-header .navbar-collapse {
+    padding-top: .85rem;
+  }
+
+  .site-header .navbar-collapse.show,
+  .site-header .navbar-collapse.collapsing {
+    max-height: calc(100vh - 74px);
+    overflow-y: auto;
+  }
+
   .brand-mark {
     width: 44px;
     height: 44px;
@@ -517,11 +619,13 @@ a[href*="/delete"]:hover {
   }
 
   .app-nav-list .nav-link {
-    display: inline-flex;
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .auth-stage {
-    min-height: auto;
+    min-height: calc(100vh - 150px);
   }
 
   .user-nav {
@@ -531,5 +635,249 @@ a[href*="/delete"]:hover {
 
   .dashboard-shell .hero > .d-flex {
     align-items: flex-start !important;
+  }
+
+  .global-search-nav {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .user-greeting {
+    max-width: 100%;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 767px) {
+  body.app-body {
+    background-attachment: scroll;
+  }
+
+  .app-main {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .app-page-container,
+  .app-auth-container {
+    padding-left: .75rem;
+    padding-right: .75rem;
+  }
+
+  .app-content-card {
+    padding: 1rem !important;
+    border-radius: 1rem !important;
+  }
+
+  .app-content-card > .container,
+  .app-content-card > .container-fluid {
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .app-page-heading {
+    gap: .55rem !important;
+  }
+
+  .app-rgb-title,
+  .dashboard-rgb-title {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .dashboard-shell {
+    padding: 1rem !important;
+  }
+
+  .dashboard-shell .hero {
+    padding: 1.25rem !important;
+  }
+
+  .dashboard-shell .hero h1 {
+    font-size: 2rem;
+  }
+
+  .dashboard-shell .hero .lead {
+    font-size: 1rem;
+  }
+
+  .dashboard-shell .hero-logo {
+    width: 56px;
+    height: 56px;
+  }
+
+  .dashboard-shell .mini-note {
+    width: 100%;
+  }
+
+  .card-header .row,
+  .card-body .row {
+    row-gap: .75rem;
+  }
+
+  .card-header .col-md-4.text-end,
+  .card-body .col-md-4.text-end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+    text-align: left !important;
+  }
+
+  .card-header .col-md-4.text-end .btn,
+  .card-body .col-md-4.text-end .btn {
+    width: auto;
+  }
+
+  .input-group {
+    min-width: 0;
+  }
+
+  .table-responsive {
+    border-radius: .85rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-responsive::after {
+    content: "Swipe to see more";
+    display: block;
+    padding: .55rem .75rem;
+    background: rgba(248, 250, 252, .92);
+    border-top: 1px solid rgba(100, 116, 139, .14);
+    color: var(--app-muted);
+    font-size: .76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .table-responsive .table {
+    min-width: 680px;
+  }
+
+  .table-responsive .table th,
+  .table-responsive .table td {
+    white-space: nowrap;
+  }
+
+  .table-responsive .table td:first-child,
+  .table-responsive .table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: inherit;
+    box-shadow: 8px 0 14px rgba(15, 23, 42, .04);
+  }
+
+  .table-responsive .table thead th:first-child {
+    z-index: 2;
+  }
+
+  .table td .btn-group,
+  .table td .btn-group-sm {
+    gap: .35rem;
+  }
+
+  .table td .btn-group > .btn,
+  .table td .btn-group-sm > .btn,
+  .table td a.btn[href*="/Details"],
+  .table td a.btn[href*="/details"],
+  .table td a.btn[href*="/summary"],
+  .table td a.btn[href*="/Edit"],
+  .table td a.btn[href*="/edit"],
+  .table td a.btn[href*="/Delete"],
+  .table td a.btn[href*="/delete"] {
+    min-width: 74px;
+    padding: .42rem .55rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .site-header .container-fluid {
+    padding-left: .75rem !important;
+    padding-right: .75rem !important;
+  }
+
+  .app-brand {
+    max-width: calc(100% - 58px);
+    margin-right: .5rem !important;
+  }
+
+  .brand-title {
+    font-size: .95rem;
+    overflow-wrap: anywhere;
+  }
+
+  .app-content-card .d-flex.align-items-start.justify-content-between,
+  .app-content-card .d-flex.justify-content-between.align-items-center,
+  .app-content-card .d-flex.align-items-center.justify-content-between {
+    align-items: stretch !important;
+    flex-direction: column !important;
+    gap: .85rem;
+  }
+
+  .app-content-card header .text-end,
+  .app-content-card > .container > .d-flex > .text-end,
+  .app-content-card > .container > footer .text-end {
+    text-align: left !important;
+  }
+
+  .app-content-card .btn:not(.btn-link):not(.btn-close),
+  .app-content-card button.btn:not(.btn-close) {
+    justify-content: center;
+    white-space: normal;
+  }
+
+  .app-content-card > .container > footer,
+  .app-content-card > .container > .d-flex.justify-content-between.align-items-center.mt-3 {
+    align-items: stretch !important;
+    flex-direction: column !important;
+    gap: .5rem;
+  }
+
+  .card-header,
+  .card-footer {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: .5rem;
+  }
+
+  .global-search-nav .input-group {
+    flex-wrap: nowrap;
+  }
+
+  .global-search-nav .btn {
+    padding-left: .7rem;
+    padding-right: .7rem;
+  }
+
+  .global-search-panel .input-group {
+    flex-wrap: wrap;
+  }
+
+  .global-search-panel .input-group-text,
+  .global-search-panel .form-control {
+    flex: 1 1 auto;
+  }
+
+  .global-search-panel .input-group-text {
+    flex-grow: 0;
+  }
+
+  .global-search-panel .btn {
+    flex: 1 0 100%;
+    border-top: 1px solid rgba(100, 116, 139, .16);
+    border-radius: 0;
+  }
+
+  .table-responsive .table {
+    min-width: 620px;
   }
 }

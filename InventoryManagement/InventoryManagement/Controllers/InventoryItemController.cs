@@ -66,6 +66,18 @@ namespace InventoryManagement.Controllers
                 return View(model);
             }
 
+            if (model.ProductId is not int productId)
+            {
+                ModelState.AddModelError(nameof(model.ProductId), "Product is required.");
+                return View(model);
+            }
+
+            if (model.WarehouseId is not int warehouseId)
+            {
+                ModelState.AddModelError(nameof(model.WarehouseId), "Warehouse is required.");
+                return View(model);
+            }
+
             var inventoryItem = new InventoryItem
             {
                 QuantityInStock = model.QuantityInStock,
@@ -73,8 +85,8 @@ namespace InventoryManagement.Controllers
                 MaximumQuantity = model.MaximumQuantity,
                 ShelfLocation = model.ShelfLocation,
                 LastCheckedAt = model.LastCheckedAt,
-                ProductId = model.ProductId.Value,
-                WarehouseId = model.WarehouseId.Value
+                ProductId = productId,
+                WarehouseId = warehouseId
             };
 
             _repository.Add(inventoryItem);
@@ -132,6 +144,18 @@ namespace InventoryManagement.Controllers
                 return NotFound();
             }
 
+            if (model.ProductId is not int productId)
+            {
+                ModelState.AddModelError(nameof(model.ProductId), "Product is required.");
+                return View(model);
+            }
+
+            if (model.WarehouseId is not int warehouseId)
+            {
+                ModelState.AddModelError(nameof(model.WarehouseId), "Warehouse is required.");
+                return View(model);
+            }
+
             var inventoryItem = new InventoryItem
             {
                 Id = model.Id,
@@ -140,8 +164,8 @@ namespace InventoryManagement.Controllers
                 MaximumQuantity = model.MaximumQuantity,
                 ShelfLocation = model.ShelfLocation,
                 LastCheckedAt = model.LastCheckedAt,
-                ProductId = model.ProductId.Value,
-                WarehouseId = model.WarehouseId.Value
+                ProductId = productId,
+                WarehouseId = warehouseId
             };
 
             _repository.Update(inventoryItem);

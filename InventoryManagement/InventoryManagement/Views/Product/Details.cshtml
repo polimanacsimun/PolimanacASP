@@ -1,8 +1,10 @@
 @using System
+@using InventoryManagement.Services
 @model InventoryManagement.Domain.Models.Product
 
 @{
     ViewData["Title"] = "Product Details";
+    var aiAdvice = ViewBag.AiAdvice as ProductAiAdvice;
 }
 
 <div class="container py-4">
@@ -127,6 +129,33 @@
                         {
                             ["ShowAttachmentActions"] = false
                         })
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">AI product advice</h5>
+                            <p class="text-muted mb-0">Generate a short stock and purchasing recommendation for this product.</p>
+                        </div>
+                        <form asp-action="AiAdvice" asp-route-id="@Model.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                Generate advice
+                            </button>
+                        </form>
+                    </div>
+
+                    @if (aiAdvice != null)
+                    {
+                        <div class="alert @(aiAdvice.IsConfigured ? "alert-info" : "alert-warning") mb-0">
+                            <div class="fw-semibold mb-1">
+                                @(aiAdvice.IsConfigured ? "AI recommendation" : "AI setup required")
+                            </div>
+                            <div class="ai-advice-text">@aiAdvice.Text</div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

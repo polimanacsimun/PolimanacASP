@@ -1,0 +1,87 @@
+@model InventoryManagement.ViewModels.Search.GlobalSearchViewModel
+
+@{
+    ViewData["Title"] = "Global Search";
+    var groupedResults = Model.Results
+        .GroupBy(result => result.Module)
+        .OrderBy(group => group.Key)
+        .ToList();
+}
+
+<div class="global-search-page">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-2">
+                <ol class="breadcrumb bg-transparent p-0 mb-0">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Global Search</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-1">Global Search</h1>
+            <p class="text-muted mb-0">Search products, suppliers, categories, warehouses, users, orders, inventory, and order items from one place.</p>
+        </div>
+
+        @if (Model.HasQuery)
+        {
+            <div class="global-search-count align-self-lg-end">
+                <span class="small text-muted">Results</span>
+                <strong>@Model.TotalResults</strong>
+            </div>
+        }
+    </div>
+
+    <form class="global-search-panel mb-4" method="get" asp-controller="GlobalSearch" asp-action="Index">
+        <label class="form-label fw-semibold" for="globalSearchPageInput">Search term</label>
+        <div class="input-group input-group-lg">
+            <span class="input-group-text bg-white">
+                <i class="bi bi-search"></i>
+            </span>
+            <input id="globalSearchPageInput" class="form-control" type="search" name="q" value="@Model.Query" placeholder="Search across the application..." autofocus />
+            <button class="btn btn-primary px-4" type="submit">Search</button>
+        </div>
+    </form>
+
+    @if (!Model.HasQuery)
+    {
+        <div class="global-search-empty text-center py-5">
+            <div class="h5 mb-2">Start with a product, order number, shelf, supplier, or user name.</div>
+            <p class="text-muted mb-0">The search will return matching records grouped by module.</p>
+        </div>
+    }
+    else if (!Model.Results.Any())
+    {
+        <div class="global-search-empty text-center py-5">
+            <div class="h5 mb-2">No results for "@Model.Query".</div>
+            <p class="text-muted mb-0">Try a shorter term or another business detail.</p>
+        </div>
+    }
+    else
+    {
+        <div class="global-search-results">
+            @foreach (var group in groupedResults)
+            {
+                <section class="global-search-group mb-4" aria-labelledby="global-search-@group.Key.Replace(" ", "-")">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 id="global-search-@group.Key.Replace(" ", "-")" class="h5 mb-0">@group.Key</h2>
+                        <span class="badge rounded-pill text-bg-light">@group.Count()</span>
+                    </div>
+
+                    <div class="list-group shadow-sm">
+                        @foreach (var result in group)
+                        {
+                            <a class="list-group-item list-group-item-action global-search-result" href="@result.Url">
+                                <div class="d-flex justify-content-between align-items-start gap-3">
+                                    <div>
+                                        <div class="fw-semibold">@result.Title</div>
+                                        <div class="text-muted small">@result.Description</div>
+                                    </div>
+                                    <span class="btn btn-sm btn-outline-primary flex-shrink-0">Open</span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+        </div>
+    }
+</div>

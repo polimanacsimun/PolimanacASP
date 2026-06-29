@@ -1,5 +1,6 @@
 using InventoryManagement.DAL.Repositories;
 using InventoryManagement.Domain.Models;
+using InventoryManagement.Services;
 using InventoryManagement.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +11,12 @@ namespace InventoryManagement.Controllers
     public class ProductController : Controller
     {
         private readonly ProductEfRepository _repository;
+        private readonly IProductAiAdvisor _aiAdvisor;
 
-        public ProductController(ProductEfRepository repository)
+        public ProductController(ProductEfRepository repository, IProductAiAdvisor aiAdvisor)
         {
             _repository = repository;
+            _aiAdvisor = aiAdvisor;
         }
 
         [AllowAnonymous]
@@ -37,6 +40,22 @@ namespace InventoryManagement.Controllers
             }
 
             return View(product);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Product/Details/{id:int}/ai-advice")]
+        [Route("catalog/{id:int}/ai-advice")]
+        public async Task<IActionResult> AiAdvice(int id)
+        {
+            var product = _repository.GetById(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.AiAdvice = await _aiAdvisor.GetAdviceAsync(product, HttpContext.RequestAborted);
+            return View(nameof(Details), product);
         }
 
         [Authorize(Roles = "Admin")]
@@ -68,7 +87,7 @@ namespace InventoryManagement.Controllers
             var product = new Product
             {
                 Name = model.Name,
-                Description = model.Description,
+                Description = model.Description ?? string.Empty,
                 Price = model.Price,
                 UnitOfMeasure = model.UnitOfMeasure,
                 MinimumStock = model.MinimumStock,
@@ -139,7 +158,7 @@ namespace InventoryManagement.Controllers
             }
 
             product.Name = model.Name;
-            product.Description = model.Description;
+            product.Description = model.Description ?? string.Empty;
             product.Price = model.Price;
             product.UnitOfMeasure = model.UnitOfMeasure;
             product.MinimumStock = model.MinimumStock;

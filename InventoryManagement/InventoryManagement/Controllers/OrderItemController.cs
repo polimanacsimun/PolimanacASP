@@ -66,6 +66,18 @@ namespace InventoryManagement.Controllers
                 return View(model);
             }
 
+            if (model.OrderId is not int orderId)
+            {
+                ModelState.AddModelError(nameof(model.OrderId), "Order is required.");
+                return View(model);
+            }
+
+            if (model.ProductId is not int productId)
+            {
+                ModelState.AddModelError(nameof(model.ProductId), "Product is required.");
+                return View(model);
+            }
+
             var orderItem = new OrderItem
             {
                 Quantity = model.Quantity,
@@ -73,8 +85,8 @@ namespace InventoryManagement.Controllers
                 TotalPrice = model.TotalPrice,
                 Discount = model.Discount,
                 CreatedAt = model.CreatedAt,
-                OrderId = model.OrderId.Value,
-                ProductId = model.ProductId.Value
+                OrderId = orderId,
+                ProductId = productId
             };
 
             _repository.Add(orderItem);
@@ -132,6 +144,18 @@ namespace InventoryManagement.Controllers
                 return NotFound();
             }
 
+            if (model.OrderId is not int orderId)
+            {
+                ModelState.AddModelError(nameof(model.OrderId), "Order is required.");
+                return View(model);
+            }
+
+            if (model.ProductId is not int productId)
+            {
+                ModelState.AddModelError(nameof(model.ProductId), "Product is required.");
+                return View(model);
+            }
+
             var orderItem = new OrderItem
             {
                 Id = model.Id,
@@ -140,8 +164,8 @@ namespace InventoryManagement.Controllers
                 TotalPrice = model.TotalPrice,
                 Discount = model.Discount,
                 CreatedAt = model.CreatedAt,
-                OrderId = model.OrderId.Value,
-                ProductId = model.ProductId.Value
+                OrderId = orderId,
+                ProductId = productId
             };
 
             _repository.Update(orderItem);

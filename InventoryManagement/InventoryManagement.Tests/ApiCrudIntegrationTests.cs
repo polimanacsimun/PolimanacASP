@@ -50,8 +50,19 @@ public class ApiCrudIntegrationTests : IClassFixture<CustomWebApplicationFactory
 
         updateResponse.EnsureSuccessStatusCode();
 
+        var updateMissingResponse = await client.PutAsJsonAsync("/api/categories/99999", new CategoryRequestDto
+        {
+            Name = "Missing Category",
+            Description = "Should not update anything"
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, updateMissingResponse.StatusCode);
+
         var deleteResponse = await client.DeleteAsync($"/api/categories/{created.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        var deleteMissingResponse = await client.DeleteAsync("/api/categories/99999");
+        Assert.Equal(HttpStatusCode.NotFound, deleteMissingResponse.StatusCode);
     }
 
     [Fact]
@@ -100,8 +111,24 @@ public class ApiCrudIntegrationTests : IClassFixture<CustomWebApplicationFactory
 
         updateResponse.EnsureSuccessStatusCode();
 
+        var updateMissingResponse = await client.PutAsJsonAsync("/api/suppliers/99999", new SupplierRequestDto
+        {
+            Name = "Missing Supplier",
+            Address = "Nowhere",
+            Phone = "+385-1-000-000",
+            Email = "missing.supplier@example.com",
+            ContactPerson = "Nobody",
+            RegistrationDate = DateTime.UtcNow.Date,
+            IsActive = true
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, updateMissingResponse.StatusCode);
+
         var deleteResponse = await client.DeleteAsync($"/api/suppliers/{created.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        var deleteMissingResponse = await client.DeleteAsync("/api/suppliers/99999");
+        Assert.Equal(HttpStatusCode.NotFound, deleteMissingResponse.StatusCode);
     }
 
     [Fact]
@@ -154,8 +181,26 @@ public class ApiCrudIntegrationTests : IClassFixture<CustomWebApplicationFactory
 
         updateResponse.EnsureSuccessStatusCode();
 
+        var updateMissingResponse = await client.PutAsJsonAsync("/api/warehouses/99999", new WarehouseRequestDto
+        {
+            Name = "Missing Warehouse",
+            Address = "Nowhere",
+            Capacity = 100,
+            Phone = "+385-1-000-000",
+            Email = "missing.warehouse@example.com",
+            Manager = "Nobody",
+            OpeningDate = DateTime.UtcNow.Date,
+            IsActive = true,
+            Type = WarehouseType.Main
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, updateMissingResponse.StatusCode);
+
         var deleteResponse = await client.DeleteAsync($"/api/warehouses/{created.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        var deleteMissingResponse = await client.DeleteAsync("/api/warehouses/99999");
+        Assert.Equal(HttpStatusCode.NotFound, deleteMissingResponse.StatusCode);
     }
 
     [Fact]
@@ -210,8 +255,27 @@ public class ApiCrudIntegrationTests : IClassFixture<CustomWebApplicationFactory
 
         updateResponse.EnsureSuccessStatusCode();
 
+        var updateMissingResponse = await client.PutAsJsonAsync("/api/products/99999", new ProductRequestDto
+        {
+            Name = "Missing Product",
+            Description = "Should not update anything",
+            Price = 10m,
+            UnitOfMeasure = "unit",
+            MinimumStock = 1,
+            CreatedAt = DateTime.UtcNow,
+            IsActive = true,
+            Type = ProductType.Physical,
+            CategoryId = 1,
+            SupplierId = 1
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, updateMissingResponse.StatusCode);
+
         var deleteResponse = await client.DeleteAsync($"/api/products/{created.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        var deleteMissingResponse = await client.DeleteAsync("/api/products/99999");
+        Assert.Equal(HttpStatusCode.NotFound, deleteMissingResponse.StatusCode);
     }
 
     [Fact]
@@ -278,8 +342,24 @@ public class ApiCrudIntegrationTests : IClassFixture<CustomWebApplicationFactory
 
         updateResponse.EnsureSuccessStatusCode();
 
+        var updateMissingResponse = await client.PutAsJsonAsync("/api/inventory-items/99999", new InventoryItemRequestDto
+        {
+            QuantityInStock = 20,
+            MinimumQuantity = 2,
+            MaximumQuantity = 60,
+            ShelfLocation = "M-01-01",
+            LastCheckedAt = DateTime.UtcNow,
+            ProductId = product.Id,
+            WarehouseId = 1
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, updateMissingResponse.StatusCode);
+
         var deleteResponse = await client.DeleteAsync($"/api/inventory-items/{created.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        var deleteMissingResponse = await client.DeleteAsync("/api/inventory-items/99999");
+        Assert.Equal(HttpStatusCode.NotFound, deleteMissingResponse.StatusCode);
     }
 
     [Fact]
@@ -326,8 +406,23 @@ public class ApiCrudIntegrationTests : IClassFixture<CustomWebApplicationFactory
 
         updateResponse.EnsureSuccessStatusCode();
 
+        var updateMissingResponse = await client.PutAsJsonAsync("/api/users/99999", new UserRequestDto
+        {
+            FirstName = "Missing",
+            LastName = "User",
+            Email = "missing.user@example.com",
+            Role = UserRole.Customer,
+            RegistrationDate = DateTime.UtcNow.Date,
+            IsActive = true
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, updateMissingResponse.StatusCode);
+
         var deleteResponse = await client.DeleteAsync($"/api/users/{created.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        var deleteMissingResponse = await client.DeleteAsync("/api/users/99999");
+        Assert.Equal(HttpStatusCode.NotFound, deleteMissingResponse.StatusCode);
     }
 
     [Fact]
@@ -376,8 +471,24 @@ public class ApiCrudIntegrationTests : IClassFixture<CustomWebApplicationFactory
 
         updateResponse.EnsureSuccessStatusCode();
 
+        var updateMissingResponse = await client.PutAsJsonAsync("/api/orders/99999", new OrderRequestDto
+        {
+            OrderNumber = $"MISSING-{Guid.NewGuid():N}",
+            OrderDate = DateTime.UtcNow,
+            TotalPrice = 15m,
+            Status = OrderStatus.Processing,
+            DeliveryDate = null,
+            Note = "Missing order update",
+            UserId = 1
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, updateMissingResponse.StatusCode);
+
         var deleteResponse = await client.DeleteAsync($"/api/orders/{created.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        var deleteMissingResponse = await client.DeleteAsync("/api/orders/99999");
+        Assert.Equal(HttpStatusCode.NotFound, deleteMissingResponse.StatusCode);
     }
 
     [Fact]
@@ -441,7 +552,23 @@ public class ApiCrudIntegrationTests : IClassFixture<CustomWebApplicationFactory
 
         updateResponse.EnsureSuccessStatusCode();
 
+        var updateMissingResponse = await client.PutAsJsonAsync("/api/order-items/99999", new OrderItemRequestDto
+        {
+            Quantity = 3,
+            UnitPrice = 20m,
+            TotalPrice = 60m,
+            Discount = 0m,
+            CreatedAt = DateTime.UtcNow,
+            OrderId = order.Id,
+            ProductId = 1
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, updateMissingResponse.StatusCode);
+
         var deleteResponse = await client.DeleteAsync($"/api/order-items/{created.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        var deleteMissingResponse = await client.DeleteAsync("/api/order-items/99999");
+        Assert.Equal(HttpStatusCode.NotFound, deleteMissingResponse.StatusCode);
     }
 }

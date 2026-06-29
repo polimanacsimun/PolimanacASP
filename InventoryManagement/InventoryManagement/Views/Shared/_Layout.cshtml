@@ -139,6 +139,20 @@
 
                     @if (!isAuthPage)
                     {
+                        <form class="global-search-nav me-lg-3 mb-3 mb-lg-0" method="get" asp-controller="GlobalSearch" asp-action="Index" role="search">
+                            <label class="visually-hidden" for="globalSearchInput">Global search</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input id="globalSearchInput" class="form-control border-start-0" type="search" name="q" value="@(currentController == "GlobalSearch" ? Context.Request.Query["q"].ToString() : string.Empty)" placeholder="Global search" />
+                                <button class="btn btn-primary" type="submit">Search</button>
+                            </div>
+                        </form>
+                    }
+
+                    @if (!isAuthPage)
+                    {
                         <partial name="_LoginPartial" />
                     }
                 </div>
